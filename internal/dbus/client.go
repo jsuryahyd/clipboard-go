@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DBusService   = "org.gnome.Shell.Extensions.ClipboardGo"
+	DBusService   = "org.gnome.Shell"
 	DBusObject    = "/org/gnome/Shell/Extensions/ClipboardGo"
 	DBusInterface = "org.gnome.Shell.Extensions.ClipboardGo"
 )

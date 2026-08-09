@@ -23,7 +23,7 @@ func main() {
 		MinWidth:          360,
 		MinHeight:         480,
 		DisableResize:     false,
-		Frameless:         true,
+		Frameless:         false,
 		AlwaysOnTop:       true,
 		HideWindowOnClose: true,
 		AssetServer: &assetserver.Options{

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.clipboard-go" path="/org/gnome/shell/extensions/clipboard-go/">
+    <key name="toggle-clipboard-go" type="as">
+      <default><![CDATA[['<Super>c']]]></default>
+      <summary>Toggle Clipboard-Go window</summary>
+      <description>Global hotkey to show the Clipboard-Go window.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -94,9 +94,10 @@ export default class ClipboardExtension extends Extension {
 
     _registerHotkey() {
         try {
+            const settings = this.getSettings('org.gnome.shell.extensions.clipboard-go');
             Main.wm.addKeybinding(
                 this._keybindingName,
-                new Gio.Settings({ schema_id: 'org.gnome.shell.keybindings' }),
+                settings,
                 Meta.KeyBindingFlags.NONE,
                 Shell.ActionMode.ALL,
                 () => {
@@ -126,18 +127,8 @@ export default class ClipboardExtension extends Extension {
         this._lastContent = content;
         this._clipboard.set_text(St.ClipboardType.CLIPBOARD, content);
 
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            try {
-                const seat = Clutter.get_default_backend().get_default_seat();
-                if (seat) {
-                    const now = 0;
-                    seat.handle_event(Clutter.Event.new_key(Clutter.EventType.KEY_PRESS, now, Clutter.EventFlags.NONE, Clutter.ModifierType.CONTROL_MASK, Clutter.KEY_v, 0));
-                    seat.handle_event(Clutter.Event.new_key(Clutter.EventType.KEY_RELEASE, now, Clutter.EventFlags.NONE, Clutter.ModifierType.CONTROL_MASK, Clutter.KEY_v, 0));
-                }
-            } catch (err) {
-                console.error(`[Clipboard-Go] Clutter synthetic event error: ${err}`);
-            }
-            return GLib.SOURCE_REMOVE;
-        });
+        console.warn('[Clipboard-Go] Auto-paste via Clutter synthetic event disabled to prevent GNOME Shell Wayland crash.');
+        // The Go application should use 'wtype' or 'ydotool' to trigger Ctrl+V, 
+        // as injecting Clutter key events from extensions is restricted and causes C segfaults.
     }
 }

@@ -6,7 +6,8 @@ This document provides the exact technical constraints, interface contracts, and
 
 ### 1.1 DBus Interface Definition (GNOME Extension <-> Go Backend)
 The GNOME Extension will act as a DBus server to bypass Wayland security restrictions, and the Go backend will act as a client.
-
+atabase ... 423153 files and directories currently installed.)
+Preparing to unpac
 - **Bus Type:** Session Bus
 - **Service Name:** `org.gnome.Shell.Extensions.ClipboardGo`
 - **Object Path:** `/org/gnome/Shell/Extensions/ClipboardGo`
