@@ -144,6 +144,15 @@
                     
                     <div class="theme-section">
                         <h4>Appearance</h4>
+                        <div class="form-group row-group" style="margin-bottom: 12px;">
+                            <div class="sub-group">
+                                <label for="set-ui-mode">UI Layout</label>
+                                <select id="set-ui-mode">
+                                    <option value="list">List (Default)</option>
+                                    <option value="cards">Cards</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group checkbox-group">
                             <label>
                                 <input type="checkbox" id="set-dual-tone"> Dual Tone Colors
@@ -158,6 +167,8 @@
                                     <option value="purple">Purple</option>
                                     <option value="emerald">Emerald</option>
                                     <option value="rose">Rose</option>
+                                    <option value="light-cream">Light Cream</option>
+                                    <option value="light-beige">Light Beige</option>
                                 </select>
                             </div>
                             <div class="sub-group">
@@ -177,6 +188,15 @@
         <!-- Toast Notification -->
         <div id="toast" class="toast hidden">
             <span id="toast-message">Item pasted</span>
+        </div>
+
+        <!-- Preview Popup (List Mode) -->
+        <div id="preview-popup" class="preview-popup hidden">
+            <div class="preview-header">
+                <span id="preview-type" class="badge"></span>
+                <span id="preview-time" class="item-time"></span>
+            </div>
+            <div id="preview-content" class="preview-body"></div>
         </div>
     </div>
 

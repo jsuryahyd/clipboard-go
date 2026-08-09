@@ -29,7 +29,7 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 15, G: 23, B: 42, A: 230}, // Modern dark Slate theme
+		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0}, // Transparent background for rounded CSS container
 		OnStartup:        app.startup,
 		OnShutdown:       app.shutdown,
 		Linux: &linux.Options{

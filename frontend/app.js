@@ -1,5 +1,7 @@
 // Clipboard-Go Frontend Controller
 
+let uiMode = localStorage.getItem('uiMode') || 'list';
+let previewTimeout = null;
 let historyItems = [];
 let selectedIndex = 0;
 let activeFilter = 'all'; // 'all', 'pinned', 'text', 'image'
@@ -33,6 +35,12 @@ const inputKeybind = document.getElementById('set-keybind');
 const inputDualTone = document.getElementById('set-dual-tone');
 const inputThemeColor = document.getElementById('set-theme-color');
 const inputRounding = document.getElementById('set-rounding');
+const inputUIMode = document.getElementById('set-ui-mode');
+const previewPopup = document.getElementById('preview-popup');
+const previewType = document.getElementById('preview-type');
+const previewTime = document.getElementById('preview-time');
+const previewContent = document.getElementById('preview-content');
+const listContainer = document.querySelector('.list-container');
 
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
@@ -47,8 +55,20 @@ async function initApp() {
     setupWailsEventListeners();
     await checkIncognitoState();
     await applySavedTheme();
+    applyUIMode();
     await loadHistory();
     focusSearch();
+}
+
+function applyUIMode() {
+    if (uiMode === 'list') {
+        listContainer.classList.add('list-mode');
+        itemList.classList.add('list-mode');
+    } else {
+        listContainer.classList.remove('list-mode');
+        itemList.classList.remove('list-mode');
+        hidePreview();
+    }
 }
 
 async function applySavedTheme() {
@@ -65,16 +85,20 @@ async function applySavedTheme() {
 }
 
 const singleToneThemes = {
-    midnight: { bg: 'rgba(15, 23, 42, 0.94)', card: 'rgba(15, 23, 42, 0.6)', accent: '#6366f1' },
-    pitch:    { bg: 'rgba(0, 0, 0, 0.94)',    card: 'rgba(0, 0, 0, 0.6)',    accent: '#3b82f6' },
-    charcoal: { bg: 'rgba(28, 25, 23, 0.94)', card: 'rgba(28, 25, 23, 0.6)', accent: '#f59e0b' }
+    midnight:    { bg: 'rgba(15, 23, 42, 0.94)',  card: 'rgba(15, 23, 42, 0.6)',  accent: '#6366f1', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(15, 23, 42, 0.2)' },
+    pitch:       { bg: 'rgba(0, 0, 0, 0.94)',     card: 'rgba(0, 0, 0, 0.6)',     accent: '#3b82f6', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(0, 0, 0, 0.2)' },
+    charcoal:    { bg: 'rgba(28, 25, 23, 0.94)',  card: 'rgba(28, 25, 23, 0.6)',  accent: '#f59e0b', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(28, 25, 23, 0.2)' },
+    'light-cream': { bg: 'rgba(253, 251, 247, 0.94)', card: 'rgba(255, 255, 255, 0.7)', accent: '#6366f1', text: '#1e293b', textSec: '#475569', overlay: 'rgba(0, 0, 0, 0.05)' },
+    'light-beige': { bg: 'rgba(245, 245, 240, 0.94)', card: 'rgba(250, 250, 248, 0.7)', accent: '#d97706', text: '#333333', textSec: '#5c5c5c', overlay: 'rgba(0, 0, 0, 0.05)' }
 };
 
 const dualToneThemes = {
-    tokyo:    { bg: 'rgba(26, 27, 38, 0.94)', card: 'rgba(36, 40, 59, 0.7)', accent: '#7aa2f7' },
-    dracula:  { bg: 'rgba(40, 42, 54, 0.94)', card: 'rgba(68, 71, 90, 0.7)', accent: '#bd93f9' },
-    nord:     { bg: 'rgba(46, 52, 64, 0.94)', card: 'rgba(59, 66, 82, 0.7)', accent: '#88c0d0' },
-    slate:    { bg: 'rgba(15, 23, 42, 0.94)', card: 'rgba(30, 41, 59, 0.7)', accent: '#6366f1' }
+    tokyo:       { bg: 'rgba(26, 27, 38, 0.94)',  card: 'rgba(36, 40, 59, 0.7)',  accent: '#7aa2f7', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(15, 23, 42, 0.2)' },
+    dracula:     { bg: 'rgba(40, 42, 54, 0.94)',  card: 'rgba(68, 71, 90, 0.7)',  accent: '#bd93f9', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(15, 23, 42, 0.2)' },
+    nord:        { bg: 'rgba(46, 52, 64, 0.94)',  card: 'rgba(59, 66, 82, 0.7)',  accent: '#88c0d0', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(15, 23, 42, 0.2)' },
+    slate:       { bg: 'rgba(15, 23, 42, 0.94)',  card: 'rgba(30, 41, 59, 0.7)',  accent: '#6366f1', text: '#f8fafc', textSec: '#94a3b8', overlay: 'rgba(15, 23, 42, 0.2)' },
+    'light-cream': { bg: 'rgba(240, 235, 225, 0.94)', card: 'rgba(253, 251, 247, 0.7)', accent: '#6366f1', text: '#1e293b', textSec: '#475569', overlay: 'rgba(0, 0, 0, 0.08)' },
+    'light-beige': { bg: 'rgba(235, 230, 220, 0.94)', card: 'rgba(245, 245, 240, 0.7)', accent: '#d97706', text: '#333333', textSec: '#5c5c5c', overlay: 'rgba(0, 0, 0, 0.08)' }
 };
 
 function updateThemeDropdown(selectedValue) {
@@ -111,6 +135,9 @@ function applyThemeToDOM(s) {
     root.style.setProperty('--bg-main', t.bg);
     root.style.setProperty('--bg-card', t.card);
     root.style.setProperty('--accent-indigo', t.accent);
+    root.style.setProperty('--text-primary', t.text);
+    root.style.setProperty('--text-secondary', t.textSec);
+    root.style.setProperty('--text-muted', t.textSec); // Using textSec for both for simplicity
     
     // Header/app background sync
     const appContainer = document.querySelector('.app-container');
@@ -118,8 +145,8 @@ function applyThemeToDOM(s) {
     const footer = document.querySelector('.footer');
     
     if (appContainer) appContainer.style.background = t.bg;
-    if (header) header.style.background = s.is_dual_tone ? 'rgba(15, 23, 42, 0.2)' : 'transparent';
-    if (footer) footer.style.background = s.is_dual_tone ? 'rgba(15, 23, 42, 0.4)' : 'transparent';
+    if (header) header.style.background = s.is_dual_tone ? t.overlay : 'transparent';
+    if (footer) footer.style.background = s.is_dual_tone ? t.overlay : 'transparent';
 }
 
 function setupEventListeners() {
@@ -197,9 +224,15 @@ function setupEventListeners() {
                     theme_color: inputThemeColor.value || "indigo",
                     border_radius: parseInt(inputRounding.value) || 10
                 };
+                
+                uiMode = inputUIMode.value;
+                localStorage.setItem('uiMode', uiMode);
+                applyUIMode();
+
                 await window.go.main.App.SaveSettings(s);
                 applyThemeToDOM(s);
                 showToast("Settings saved");
+                renderItems();
             }
         } catch (e) {
             console.error("Save settings error:", e);
@@ -320,38 +353,79 @@ function renderItems() {
         const isCode = isCodeSnippet(item.content);
         const timeAgo = formatTimeAgo(item.created_at);
 
-        card.innerHTML = `
-            <div class="item-header">
-                <div class="item-meta">
-                    <span class="badge ${item.type === 'image' ? 'badge-image' : 'badge-text'}">${item.type}</span>
-                    <span class="item-time">${timeAgo}</span>
+        let cardInner = '';
+        if (uiMode === 'list') {
+            cardInner = `
+                <div class="list-item-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${item.type === 'text' 
+                            ? '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>' 
+                            : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>'}
+                    </svg>
                 </div>
-                <div class="item-actions">
+                ${item.type === 'image' 
+                    ? `<img src="${item.content}" class="item-image-preview" alt="Image">`
+                    : `<div class="item-content">${escapeHtml(item.content)}</div>`
+                }
+                <div class="list-item-actions">
                     <button class="action-btn star-btn ${item.pinned ? 'pinned' : ''}" title="${item.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="${item.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                         </svg>
                     </button>
-                    <button class="action-btn" title="Delete" data-action="delete">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
                 </div>
-            </div>
-            
-            ${item.type === 'image' 
-                ? `<img src="${item.content}" class="item-image-preview" alt="Clipboard Image">`
-                : `<div class="item-content ${isCode ? 'code-snippet' : ''}">${escapeHtml(item.content)}</div>`
-            }
+            `;
+        } else {
+            cardInner = `
+                <div class="item-header">
+                    <div class="item-meta">
+                        <span class="badge ${item.type === 'image' ? 'badge-image' : 'badge-text'}">${item.type}</span>
+                        <span class="item-time">${timeAgo}</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn star-btn ${item.pinned ? 'pinned' : ''}" title="${item.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="${item.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </button>
+                        <button class="action-btn" title="Delete" data-action="delete">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                ${item.type === 'image' 
+                    ? `<img src="${item.content}" class="item-image-preview" alt="Clipboard Image">`
+                    : `<div class="item-content ${isCode ? 'code-snippet' : ''}">${escapeHtml(item.content)}</div>`
+                }
 
-            ${item.tags && item.tags.length > 0 ? `
-                <div class="item-tags">
-                    ${item.tags.map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
-                </div>
-            ` : ''}
-        `;
+                ${item.tags && item.tags.length > 0 ? `
+                    <div class="item-tags">
+                        ${item.tags.map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+        
+        card.innerHTML = cardInner;
+
+        card.addEventListener('mouseenter', () => {
+            if (uiMode === 'list') {
+                clearTimeout(hideTimeout);
+                clearTimeout(previewTimeout);
+                previewTimeout = setTimeout(() => showPreview(item, card), 800);
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            if (uiMode === 'list') {
+                clearTimeout(previewTimeout);
+                hideTimeout = setTimeout(() => hidePreview(), 100);
+            }
+        });
 
         card.addEventListener('click', (e) => {
             const actionBtn = e.target.closest('[data-action]');
@@ -373,6 +447,86 @@ function renderItems() {
     });
 
     scrollToSelected();
+    if (uiMode === 'list' && historyItems[selectedIndex]) {
+        hidePreview();
+        clearTimeout(hideTimeout);
+        clearTimeout(previewTimeout);
+        previewTimeout = setTimeout(() => showPreview(historyItems[selectedIndex]), 800);
+    }
+}
+
+let hideTimeout = null;
+
+function setupPopupInteraction() {
+    if (previewPopup && !previewPopup.dataset.eventsBound) {
+        previewPopup.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+        });
+        previewPopup.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => hidePreview(), 100);
+        });
+        previewPopup.dataset.eventsBound = "true";
+    }
+}
+
+function showPreview(item, cardElement) {
+    if (!cardElement) {
+        cardElement = document.querySelector(`.item-card[data-id="${item.id}"]`);
+    }
+
+    previewType.textContent = item.type;
+    previewType.className = `badge ${item.type === 'image' ? 'badge-image' : 'badge-text'}`;
+    previewTime.textContent = formatTimeAgo(item.created_at);
+    
+    if (item.type === 'image') {
+        previewContent.innerHTML = `<img src="${item.content}" alt="Preview">`;
+    } else {
+        const isCode = isCodeSnippet(item.content);
+        previewContent.innerHTML = isCode 
+            ? `<pre><code>${escapeHtml(item.content)}</code></pre>` 
+            : escapeHtml(item.content);
+    }
+    
+    previewPopup.classList.add('visible');
+    previewPopup.classList.remove('hidden');
+
+    setupPopupInteraction();
+
+    if (cardElement) {
+        previewPopup.style.maxHeight = '300px';
+        const cardRect = cardElement.getBoundingClientRect();
+        const popupRect = previewPopup.getBoundingClientRect();
+        const bodyHeight = document.body.clientHeight;
+
+        let top = cardRect.bottom + 8;
+        let availableBelow = bodyHeight - 10 - top;
+        let availableAbove = cardRect.top - 60 - 8;
+
+        if (availableBelow >= popupRect.height) {
+            previewPopup.style.top = `${top}px`;
+        } else if (availableAbove >= popupRect.height) {
+            top = cardRect.top - popupRect.height - 8;
+            previewPopup.style.top = `${top}px`;
+        } else {
+            // Doesn't fit, pick side with most space and shrink
+            if (availableBelow > availableAbove) {
+                previewPopup.style.top = `${top}px`;
+                previewPopup.style.maxHeight = `${availableBelow}px`;
+            } else {
+                previewPopup.style.maxHeight = `${availableAbove}px`;
+                top = cardRect.top - availableAbove - 8;
+                previewPopup.style.top = `${top}px`;
+            }
+        }
+
+        previewPopup.style.left = '50%';
+        previewPopup.style.transform = 'translateX(-50%)';
+    }
+}
+
+function hidePreview() {
+    previewPopup.classList.remove('visible');
+    previewPopup.classList.add('hidden');
 }
 
 function handleGlobalKeydown(e) {
@@ -441,6 +595,13 @@ function updateSelectionUI() {
         }
     });
     scrollToSelected();
+
+    if (uiMode === 'list' && historyItems[selectedIndex]) {
+        hidePreview();
+        clearTimeout(hideTimeout);
+        clearTimeout(previewTimeout);
+        previewTimeout = setTimeout(() => showPreview(historyItems[selectedIndex]), 800);
+    }
 }
 
 function scrollToSelected() {
@@ -504,6 +665,7 @@ async function openSettings() {
                 updateThemeDropdown(s.theme_color);
                 inputThemeColor.value = s.theme_color;
                 inputRounding.value = s.border_radius;
+                inputUIMode.value = uiMode;
             }
         }
     } catch (e) {
