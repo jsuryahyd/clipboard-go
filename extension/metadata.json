@@ -1,0 +1,10 @@
+{
+  "uuid": "clipboard-go@surya.dev",
+  "name": "Clipboard-Go Bridge",
+  "description": "Headless Wayland clipboard bridge and hotkey handler for Clipboard-Go",
+  "shell-version": [
+    "40", "41", "42", "43", "44", "45", "46", "47"
+  ],
+  "url": "https://github.com/surya/clipboard-go",
+  "version": 1
+}

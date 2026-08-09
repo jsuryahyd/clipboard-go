@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "clipboard-go",
+  "outputfilename": "clipboard-go",
+  "frontend:dir": "frontend",
+  "author": {
+    "name": "Surya",
+    "email": "surya@local"
+  },
+  "info": {
+    "companyName": "Clipboard-Go",
+    "productName": "Clipboard-Go",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright 2026",
+    "comments": "Hybrid Wayland Clipboard Manager"
+  }
+}

@@ -1,0 +1,20 @@
+# Build artifacts
+build/
+bin/
+dist/
+*.zip
+clipboard-go
+
+# State / Runtime files
+app.log
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE / System
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

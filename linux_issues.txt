@@ -1,0 +1,315 @@
+Title: Copyous crashes gnome-shell on boot/login with GNOME 50.1 (Wayland)
+URL: https://github.com/boerdereinar/copyous/issues/152
+Labels: 
+State: open
+
+Title: Blur my panel added pop up blur, pls add support for it
+URL: https://github.com/boerdereinar/copyous/issues/151
+Labels: enhancement
+State: open
+
+Title: Performance Bottleneck: Eager Loading and Heavy `js::NativeGetProperty` Overhead Causing Freezes and NVIDIA dGPU Wake-Up
+URL: https://github.com/boerdereinar/copyous/issues/150
+Labels: 
+State: open
+
+Title: All pinned and tagged items deleted without my action
+URL: https://github.com/boerdereinar/copyous/issues/148
+Labels: bug
+State: open
+
+Title: SQLite backend cause gnome crash
+URL: https://github.com/boerdereinar/copyous/issues/146
+Labels: bug
+State: open
+
+Title: Show installed build version in General settings
+URL: https://github.com/boerdereinar/copyous/pull/143
+Labels: 
+State: open
+
+Title: BUG: Pinned and Tags items are 4x multiplied
+URL: https://github.com/boerdereinar/copyous/issues/142
+Labels: bug
+State: open
+
+Title: feat: Add repeatable performance benchmarks for clipboard dialog open latency
+URL: https://github.com/boerdereinar/copyous/issues/141
+Labels: enhancement
+State: open
+
+Title: Add option to disable auto paste
+URL: https://github.com/boerdereinar/copyous/issues/140
+Labels: enhancement
+State: open
+
+Title: Large clipboard history causes session to freeze on login
+URL: https://github.com/boerdereinar/copyous/issues/139
+Labels: bug
+State: open
+
+Title: Optimize clipboard performance
+URL: https://github.com/boerdereinar/copyous/pull/138
+Labels: 
+State: closed
+
+Title: 🚀 perf: ⚡ perf: optimize cold-boot startup and dialog open path
+URL: https://github.com/boerdereinar/copyous/pull/135
+Labels: 
+State: open
+
+Title: Bracketed paste broken in modern terminals (Alacritty, Ghostty) — paste outputs literal "6~"
+URL: https://github.com/boerdereinar/copyous/issues/134
+Labels: bug
+State: open
+
+Title: fix: bundle highlight.js during build
+URL: https://github.com/boerdereinar/copyous/pull/132
+Labels: 
+State: closed
+
+Title: Avoided redundant work in clipboard hot paths to improve extension speed
+URL: https://github.com/boerdereinar/copyous/pull/130
+Labels: 
+State: closed
+
+Title: The clipboard content does not appear when clicking the tray icon.
+URL: https://github.com/boerdereinar/copyous/issues/129
+Labels: bug
+State: open
+
+Title: Initial load is too slow
+URL: https://github.com/boerdereinar/copyous/issues/128
+Labels: bug
+State: open
+
+Title: SQLite backend freezes GNOME Shell on login, while JSON backend works normally
+URL: https://github.com/boerdereinar/copyous/issues/127
+Labels: bug
+State: open
+
+Title: Replace the old "Show Indicator" preference with "Show Clipboard Icon in Indicator"
+URL: https://github.com/boerdereinar/copyous/pull/125
+Labels: 
+State: closed
+
+Title: Auto-paste does not work after selecting clipboard entry (GNOME 50 / Wayland)
+URL: https://github.com/boerdereinar/copyous/issues/124
+Labels: enhancement
+State: open
+
+Title: Fix panel icon left-click not opening clipboard dialog on GNOME 50
+URL: https://github.com/boerdereinar/copyous/issues/123
+Labels: enhancement
+State: closed
+
+Title: Quick "cycle" and notification for selected clipboard item like in https://extensions.gnome.org/extension/779/clipboard-indicator/
+URL: https://github.com/boerdereinar/copyous/issues/122
+Labels: enhancement
+State: open
+
+Title: feat: backport to GNOME 46 (libadwaita 1.5 / GJS ES2022)
+URL: https://github.com/boerdereinar/copyous/pull/117
+Labels: 
+State: open
+
+Title: fix(indicator): restore left-click dialog open on GNOME 50+
+URL: https://github.com/boerdereinar/copyous/pull/116
+Labels: 
+State: closed
+
+Title: Disabling Pin Feature(s)
+URL: https://github.com/boerdereinar/copyous/issues/115
+Labels: enhancement
+State: open
+
+Title: Clicking clipboard indicator after upgrading to latest version on gnome 50 does not open clipboard history
+URL: https://github.com/boerdereinar/copyous/issues/114
+Labels: bug
+State: closed
+
+Title: Incorrect panel icon behavior on Ubuntu 26.04 / GNOME 50
+URL: https://github.com/boerdereinar/copyous/issues/113
+Labels: bug
+State: closed
+
+Title: No clipboard data
+URL: https://github.com/boerdereinar/copyous/issues/112
+Labels: bug
+State: open
+
+Title: Panel icon has smaller padding
+URL: https://github.com/boerdereinar/copyous/issues/111
+Labels: bug
+State: open
+
+Title: Missing yaru icons
+URL: https://github.com/boerdereinar/copyous/issues/110
+Labels: bug
+State: open
+
+Title: "Clipboard is empty" is being truncated
+URL: https://github.com/boerdereinar/copyous/issues/109
+Labels: bug
+State: open
+
+Title: Tray Icon Action
+URL: https://github.com/boerdereinar/copyous/issues/108
+Labels: enhancement
+State: closed
+
+Title: shortcut to open different views (default/compact/custom)
+URL: https://github.com/boerdereinar/copyous/issues/107
+Labels: enhancement
+State: open
+
+Title: Emoji / kaomoji / gif integration
+URL: https://github.com/boerdereinar/copyous/issues/106
+Labels: enhancement
+State: open
+
+Title: Three-dot context menu (popover) stays dark when light theme is active**
+URL: https://github.com/boerdereinar/copyous/issues/96
+Labels: bug
+State: closed
+
+Title: Fixes for GNOME 50
+URL: https://github.com/boerdereinar/copyous/pull/91
+Labels: 
+State: closed
+
+Title: Please add an option to keep the pinned items at the top of the list
+URL: https://github.com/boerdereinar/copyous/issues/89
+Labels: enhancement
+State: open
+
+Title: GNOME Shell freeze on login when using GDA 6 SQLite database
+URL: https://github.com/boerdereinar/copyous/issues/88
+Labels: bug
+State: closed
+
+Title: Double-click “paste from history” toggles Insert/Overwrite mode (caret becomes a block) instead of pasting text (mostly Qt / GTK3 apps)
+URL: https://github.com/boerdereinar/copyous/issues/86
+Labels: bug
+State: open
+
+Title: Fixes for GNOME 50
+URL: https://github.com/boerdereinar/copyous/pull/85
+Labels: 
+State: closed
+
+Title: Support yaru theme
+URL: https://github.com/boerdereinar/copyous/issues/84
+Labels: enhancement
+State: closed
+
+Title: [Feature Request/Bug] Support for File URIs and x-special/gnome-copied-files MIME type
+URL: https://github.com/boerdereinar/copyous/issues/83
+Labels: bug
+State: closed
+
+Title: Create "Show icon in indicator" toggle
+URL: https://github.com/boerdereinar/copyous/issues/82
+Labels: enhancement
+State: open
+
+Title: Fix database schema migration causing duplicate column error
+URL: https://github.com/boerdereinar/copyous/pull/81
+Labels: 
+State: closed
+
+Title: Switch to next Item when Dialog already open
+URL: https://github.com/boerdereinar/copyous/issues/80
+Labels: enhancement
+State: closed
+
+Title: Cannot detect system libgda6 installed on Arch Linux
+URL: https://github.com/boerdereinar/copyous/issues/79
+Labels: bug
+State: closed
+
+Title: Option to show the clipboard button in the System Menu.
+URL: https://github.com/boerdereinar/copyous/issues/76
+Labels: enhancement
+State: open
+
+Title: Highlight.js system install
+URL: https://github.com/boerdereinar/copyous/issues/75
+Labels: 
+State: closed
+
+Title: GNOME freezes on login
+URL: https://github.com/boerdereinar/copyous/issues/74
+Labels: bug
+State: open
+
+Title: Add editable item titles for clipboard items
+URL: https://github.com/boerdereinar/copyous/pull/73
+Labels: 
+State: closed
+
+Title: The GNOME freezes for a few seconds when the clipboard is opened.
+URL: https://github.com/boerdereinar/copyous/issues/72
+Labels: bug
+State: open
+
+Title: Possibility to disable "In Memory Database" even if libgda is not installed
+URL: https://github.com/boerdereinar/copyous/issues/71
+Labels: enhancement
+State: closed
+
+Title: GNOME Shell keeps NVIDIA GPU active when Copyous is enabled
+URL: https://github.com/boerdereinar/copyous/issues/70
+Labels: bug
+State: open
+
+Title: Option to disable primary paste from everywhere
+URL: https://github.com/boerdereinar/copyous/issues/69
+Labels: enhancement
+State: open
+
+Title: Preserve clipboard history after screen lock/unlock
+URL: https://github.com/boerdereinar/copyous/issues/68
+Labels: enhancement
+State: closed
+
+Title: Enabling Copyous makes GNOME shell black screen / crash
+URL: https://github.com/boerdereinar/copyous/issues/67
+Labels: bug
+State: closed
+
+Title: Light / dark mode out of sync with host
+URL: https://github.com/boerdereinar/copyous/issues/66
+Labels: bug
+State: closed
+
+Title: not background
+URL: https://github.com/boerdereinar/copyous/issues/63
+Labels: bug
+State: closed
+
+Title: No items added from Firefox incognito mode
+URL: https://github.com/boerdereinar/copyous/issues/60
+Labels: bug
+State: closed
+
+Title: Add "Title" Field to Paste List Items in Paste Manager
+URL: https://github.com/boerdereinar/copyous/issues/57
+Labels: enhancement
+State: closed
+
+Title: Gnome session freezes when enabling copyous
+URL: https://github.com/boerdereinar/copyous/issues/56
+Labels: bug
+State: closed
+
+Title: Can cause another extension, user theme, to error out
+URL: https://github.com/boerdereinar/copyous/issues/55
+Labels: bug
+State: closed
+
+Title: Duplicate "Fill" options in position dropdown menu
+URL: https://github.com/boerdereinar/copyous/issues/53
+Labels: bug
+State: closed
+

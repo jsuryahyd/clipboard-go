@@ -1,0 +1,282 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sync"
+	"time"
+
+	"clipboard-go/internal/db"
+	"clipboard-go/internal/dbus"
+	"clipboard-go/internal/logger"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
+)
+
+type App struct {
+	ctx        context.Context
+	database   *db.DB
+	dbusClient *dbus.Client
+	incognito  bool
+	mu         sync.RWMutex
+}
+
+func NewApp() *App {
+	return &App{
+		incognito: false,
+	}
+}
+
+func (a *App) startup(ctx context.Context) {
+	a.ctx = ctx
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		homeDir = "."
+	}
+
+	stateDir := filepath.Join(homeDir, ".local", "state", "clipboard-go")
+	logPath := filepath.Join(stateDir, "app.log")
+	dbPath := filepath.Join(stateDir, "clipboard.db")
+
+	// 1. Initialize Structured Logger
+	_, err = logger.InitLogger(logPath, logger.INFO)
+	if err != nil {
+		fmt.Printf("Error initializing logger: %v\n", err)
+	}
+	logger.Info("Starting Clipboard-Go Wails Core Engine...")
+
+	// 2. Initialize SQLite Database
+	database, err := db.InitDB(dbPath)
+	if err != nil {
+		logger.Error("Failed to initialize database: %v", err)
+	} else {
+		a.database = database
+		logger.Info("SQLite Database initialized at %s", dbPath)
+	}
+
+	// 3. Connect to DBus Client
+	dbusClient, err := dbus.NewClient(a.onClipboardChanged, a.onShowUI)
+	if err != nil {
+		logger.Warn("DBus Client initialization failed (GNOME Extension might be inactive): %v", err)
+	} else {
+		a.dbusClient = dbusClient
+	}
+
+	// 4. Register Autostart Desktop Entry
+	a.ensureAutostart(homeDir)
+
+	// 5. Run initial DB cleanup & periodic maintenance goroutine
+	go a.startMaintenanceLoop()
+}
+
+func (a *App) shutdown(ctx context.Context) {
+	logger.Info("Shutting down Clipboard-Go backend...")
+	if a.dbusClient != nil {
+		a.dbusClient.Close()
+	}
+	if a.database != nil {
+		_ = a.database.Close()
+	}
+}
+
+func (a *App) onClipboardChanged(itemType, content string) {
+	a.mu.RLock()
+	isIncognito := a.incognito
+	a.mu.RUnlock()
+
+	if isIncognito {
+		logger.Info("Incognito mode active: Clipboard change ignored")
+		return
+	}
+
+	if a.database == nil {
+		return
+	}
+
+	newItem, err := a.database.InsertItem(itemType, content, "System")
+	if err != nil {
+		logger.Error("Failed to insert clipboard item: %v", err)
+		return
+	}
+
+	logger.Info("Recorded new clipboard item (ID: %d, Type: %s)", newItem.ID, newItem.Type)
+	runtime.EventsEmit(a.ctx, "clipboard:changed", newItem)
+}
+
+func (a *App) onShowUI() {
+	logger.Info("ShowUI signal received from GNOME Extension")
+	if a.ctx != nil {
+		runtime.WindowShow(a.ctx)
+		runtime.WindowUnminimise(a.ctx)
+		runtime.EventsEmit(a.ctx, "ui:focus_search", nil)
+	}
+}
+
+func (a *App) startMaintenanceLoop() {
+	if a.database != nil {
+		deleted, err := a.database.Cleanup(30, 10*1024*1024)
+		if err != nil {
+			logger.Error("DB Cleanup error: %v", err)
+		} else {
+			logger.Info("Initial DB cleanup purged %d expired items", deleted)
+		}
+	}
+
+	ticker := time.NewTicker(24 * time.Hour)
+	for range ticker.C {
+		if a.database != nil {
+			deleted, err := a.database.Cleanup(30, 10*1024*1024)
+			if err != nil {
+				logger.Error("Periodic DB cleanup error: %v", err)
+			} else {
+				logger.Info("Periodic DB cleanup purged %d items", deleted)
+			}
+		}
+	}
+}
+
+func (a *App) ensureAutostart(homeDir string) {
+	autostartDir := filepath.Join(homeDir, ".config", "autostart")
+	_ = os.MkdirAll(autostartDir, 0755)
+
+	execPath, err := os.Executable()
+	if err != nil {
+		execPath = "clipboard-go"
+	}
+
+	desktopContent := fmt.Sprintf(`[Desktop Entry]
+Type=Application
+Name=Clipboard-Go
+Comment=Hybrid Wayland Clipboard Manager
+Exec=%s --hidden
+Icon=clipboard
+Terminal=false
+Categories=Utility;
+X-GNOME-Autostart-enabled=true
+`, execPath)
+
+	desktopPath := filepath.Join(autostartDir, "clipboard-go.desktop")
+	err = os.WriteFile(desktopPath, []byte(desktopContent), 0644)
+	if err != nil {
+		logger.Warn("Failed to write autostart desktop file: %v", err)
+	} else {
+		logger.Info("Autostart desktop entry verified at %s", desktopPath)
+	}
+}
+
+// --- Frontend Bindings ---
+
+func (a *App) GetHistory(query, tag string, pinnedOnly bool, limit, offset int) []db.ClipboardItem {
+	if a.database == nil {
+		return []db.ClipboardItem{}
+	}
+	items, err := a.database.GetRecentItems(limit, offset, query, tag, pinnedOnly)
+	if err != nil {
+		logger.Error("GetHistory error: %v", err)
+		return []db.ClipboardItem{}
+	}
+	return items
+}
+
+func (a *App) TriggerPaste(id int64) error {
+	if a.database == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	item, err := a.database.GetItemByID(id)
+	if err != nil {
+		return err
+	}
+
+	// 1. Immediately hide window to yield focus back to target app
+	if a.ctx != nil {
+		runtime.WindowHide(a.ctx)
+	}
+
+	// 2. Call DBus to inject paste
+	if a.dbusClient != nil {
+		err = a.dbusClient.InjectPaste(item.Type, item.Content)
+		if err != nil {
+			logger.Error("TriggerPaste DBus error: %v", err)
+			return err
+		}
+	} else {
+		logger.Warn("DBus client unavailable to inject paste")
+	}
+
+	return nil
+}
+
+func (a *App) TogglePin(id int64) (bool, error) {
+	if a.database == nil {
+		return false, fmt.Errorf("database not initialized")
+	}
+	pinned, err := a.database.TogglePin(id)
+	if err != nil {
+		return false, err
+	}
+	return pinned, nil
+}
+
+func (a *App) DeleteItem(id int64) error {
+	if a.database == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	return a.database.DeleteItem(id)
+}
+
+func (a *App) ClearHistory() error {
+	if a.database == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	return a.database.ClearHistory()
+}
+
+func (a *App) AddTag(id int64, tag string) error {
+	if a.database == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	return a.database.AddTag(id, tag)
+}
+
+func (a *App) RemoveTag(id int64, tag string) error {
+	if a.database == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	return a.database.RemoveTag(id, tag)
+}
+
+func (a *App) ToggleIncognito() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.incognito = !a.incognito
+	logger.Info("Incognito mode toggled to %v", a.incognito)
+	return a.incognito
+}
+
+func (a *App) IsIncognito() bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.incognito
+}
+
+func (a *App) HideWindow() {
+	if a.ctx != nil {
+		runtime.WindowHide(a.ctx)
+	}
+}
+
+func (a *App) GetStats() map[string]interface{} {
+	if a.database == nil {
+		return map[string]interface{}{"status": "db_offline"}
+	}
+	stats, err := a.database.GetStats()
+	if err != nil {
+		return map[string]interface{}{"error": err.Error()}
+	}
+	stats["incognito"] = a.IsIncognito()
+	return stats
+}
