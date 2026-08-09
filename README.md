@@ -2,6 +2,11 @@
 
 Clipboard-Gnome is a fast, hybrid Wayland/X11 clipboard manager built with Go and Wails.
 
+## Screenshots
+![Light Theme](./docs/screenshot1.png)
+![Dark Theme](./docs/screenshot2.png)
+![Settings](./docs/screenshot3.png)
+
 ## Architecture
 
 Clipboard-Gnome utilizes a hybrid architecture bridging GNOME Shell (supports gnome only) with a Wails application via DBus to bypass Wayland clipboard isolation restrictions.
