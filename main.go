@@ -17,7 +17,7 @@ func main() {
 	app := NewApp()
 
 	err := wails.Run(&options.App{
-		Title:             "Clipboard-Go",
+		Title:             "Clipboard-Gnome",
 		Width:             420,
 		Height:            640,
 		MinWidth:          360,

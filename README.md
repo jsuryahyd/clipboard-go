@@ -1,13 +1,10 @@
-# Clipboard-Go
+# Clipboard-Gnome
 
-Clipboard-Go is a fast, hybrid Wayland/X11 clipboard manager built with Go and Wails. 
-
-## Unlicensed
-This project was built with AI and is unlicensed. You are free to use, modify, and distribute it as you want.
+Clipboard-Gnome is a fast, hybrid Wayland/X11 clipboard manager built with Go and Wails.
 
 ## Architecture
 
-Clipboard-Go utilizes a hybrid architecture bridging GNOME Shell with a Wails application via DBus to bypass Wayland clipboard isolation restrictions.
+Clipboard-Gnome utilizes a hybrid architecture bridging GNOME Shell (supports gnome only) with a Wails application via DBus to bypass Wayland clipboard isolation restrictions.
 
 ```mermaid
 flowchart LR
@@ -37,12 +34,7 @@ flowchart LR
 An installation script is provided in the repository to build and install the necessary components automatically.
 
 ### Dependencies
-Ensure the following tools are installed on your system before proceeding:
-- `go`
-- `npm`
-- `sqlite3`
-- `zip` & `unzip`
-- `curl`
+Ensure the following tools are installed on your system before proceeding: `go`, `npm`, `sqlite3`, `zip`, `unzip`, `curl`.
 
 ### Steps
 1. Clone this repository and navigate to the root directory.
@@ -59,3 +51,6 @@ Ensure the following tools are installed on your system before proceeding:
    - Press `Alt+F2`, type `r`, and hit Enter (X11 only) or logout and log back in (Wayland).
 4. **Enable the Extension**: Open the *Extensions* app or use the GNOME Extensions website to enable the `clipboard-go@surya.dev` extension.
 5. **Auto-Start**: On its first run, `clipboard-go` will automatically add an autostart entry (`~/.config/autostart/clipboard-go.desktop`) so it runs seamlessly in the background on subsequent boots.
+
+## Unlicensed
+This project was built with AI and is unlicensed. You are free to use, modify, and distribute it as you want.

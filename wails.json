@@ -8,8 +8,8 @@
     "email": "surya@local"
   },
   "info": {
-    "companyName": "Clipboard-Go",
-    "productName": "Clipboard-Go",
+    "companyName": "Clipboard-Gnome",
+    "productName": "Clipboard-Gnome",
     "productVersion": "1.0.0",
     "copyright": "Copyright 2026",
     "comments": "Hybrid Wayland Clipboard Manager"
