@@ -153,16 +153,17 @@ func (a *App) ensureAutostart(homeDir string) {
 		execPath = "clipboard-gnome"
 	}
 
+	iconPath := filepath.Join(homeDir, ".local", "share", "icons", "clipboard-gnome.png")
 	desktopContent := fmt.Sprintf(`[Desktop Entry]
 Type=Application
 Name=Clipboard-Gnome
 Comment=Hybrid Wayland Clipboard Manager
 Exec=%s --hidden
-Icon=clipboard
+Icon=%s
 Terminal=false
 Categories=Utility;
 X-GNOME-Autostart-enabled=true
-`, execPath)
+`, execPath, iconPath)
 
 	desktopPath := filepath.Join(autostartDir, "clipboard-gnome.desktop")
 	err = os.WriteFile(desktopPath, []byte(desktopContent), 0644)
@@ -171,6 +172,11 @@ X-GNOME-Autostart-enabled=true
 	} else {
 		logger.Info("Autostart desktop entry verified at %s", desktopPath)
 	}
+
+	appsDir := filepath.Join(homeDir, ".local", "share", "applications")
+	_ = os.MkdirAll(appsDir, 0755)
+	appsDesktopPath := filepath.Join(appsDir, "clipboard-gnome.desktop")
+	_ = os.WriteFile(appsDesktopPath, []byte(desktopContent), 0644)
 }
 
 // --- Frontend Bindings ---

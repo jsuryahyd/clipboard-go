@@ -33,6 +33,11 @@ make build
 echo "Installing GNOME Extension..."
 make install
 
+# Copy icon
+echo "Installing icon..."
+mkdir -p ~/.local/share/icons
+cp assets/appicon.png ~/.local/share/icons/clipboard-gnome.png
+
 # Copy binary to path
 echo "Installing binary to ~/.local/bin..."
 mkdir -p ~/.local/bin
