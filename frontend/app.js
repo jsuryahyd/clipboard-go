@@ -239,6 +239,44 @@ function setupEventListeners() {
         }
     });
 
+    // Event Delegation for list items
+    itemList.addEventListener('click', (e) => {
+        const card = e.target.closest('.item-card');
+        if (!card) return;
+        const id = parseInt(card.dataset.id);
+        const actionBtn = e.target.closest('[data-action]');
+        
+        if (actionBtn) {
+            const action = actionBtn.dataset.action;
+            if (action === 'pin') togglePinItem(id);
+            else if (action === 'delete') deleteItem(id);
+            e.stopPropagation();
+            return;
+        }
+        selectAndPaste(id);
+    });
+
+    itemList.addEventListener('mouseover', (e) => {
+        const card = e.target.closest('.item-card');
+        if (card && uiMode === 'list') {
+            const id = parseInt(card.dataset.id);
+            const item = historyItems.find(i => i.id === id);
+            if (item) {
+                clearTimeout(hideTimeout);
+                clearTimeout(previewTimeout);
+                previewTimeout = setTimeout(() => showPreview(item, card), 800);
+            }
+        }
+    });
+
+    itemList.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.item-card');
+        if (card && uiMode === 'list') {
+            clearTimeout(previewTimeout);
+            hideTimeout = setTimeout(() => hidePreview(), 100);
+        }
+    });
+
     // Keyboard Shortcuts
     document.addEventListener('keydown', handleGlobalKeydown);
 }
