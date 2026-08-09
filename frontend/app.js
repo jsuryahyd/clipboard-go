@@ -373,17 +373,24 @@ async function loadHistory() {
 }
 
 function renderItems() {
-    itemList.innerHTML = '';
-
     if (historyItems.length === 0) {
+        itemList.innerHTML = '';
         emptyState.classList.remove('hidden');
         return;
     }
 
     emptyState.classList.add('hidden');
 
+    const existingCards = Array.from(itemList.querySelectorAll('.item-card'));
+    const cardsMap = new Map(existingCards.map(c => [c.dataset.id, c]));
+    const fragment = document.createDocumentFragment();
+
     historyItems.forEach((item, index) => {
-        const card = document.createElement('div');
+        let card = cardsMap.get(item.id.toString());
+        if (!card) {
+            card = document.createElement('div');
+            card.dataset.id = item.id;
+        }
         card.className = `item-card ${index === selectedIndex ? 'selected' : ''}`;
         card.dataset.id = item.id;
         card.dataset.index = index;
@@ -449,40 +456,12 @@ function renderItems() {
         }
         
         card.innerHTML = cardInner;
-
-        card.addEventListener('mouseenter', () => {
-            if (uiMode === 'list') {
-                clearTimeout(hideTimeout);
-                clearTimeout(previewTimeout);
-                previewTimeout = setTimeout(() => showPreview(item, card), 800);
-            }
-        });
-
-        card.addEventListener('mouseleave', () => {
-            if (uiMode === 'list') {
-                clearTimeout(previewTimeout);
-                hideTimeout = setTimeout(() => hidePreview(), 100);
-            }
-        });
-
-        card.addEventListener('click', (e) => {
-            const actionBtn = e.target.closest('[data-action]');
-            if (actionBtn) {
-                const action = actionBtn.dataset.action;
-                if (action === 'pin') {
-                    togglePinItem(item.id);
-                } else if (action === 'delete') {
-                    deleteItem(item.id);
-                }
-                e.stopPropagation();
-                return;
-            }
-
-            selectAndPaste(item.id);
-        });
-
-        itemList.appendChild(card);
+        fragment.appendChild(card);
+        cardsMap.delete(item.id.toString());
     });
+
+    cardsMap.forEach(card => card.remove());
+    itemList.appendChild(fragment);
 
     scrollToSelected();
     if (uiMode === 'list' && historyItems[selectedIndex]) {
