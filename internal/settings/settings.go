@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"os/exec"
-	"clipboard-go/internal/logger"
+	"clipboard-gnome/internal/logger"
 )
 
 type AppSettings struct {
@@ -33,7 +33,7 @@ func GetConfigPath() string {
 	if err != nil {
 		homeDir = "."
 	}
-	return filepath.Join(homeDir, ".config", "clipboard-go", "settings.json")
+	return filepath.Join(homeDir, ".config", "clipboard-gnome", "settings.json")
 }
 
 func LoadSettings() *AppSettings {
@@ -70,10 +70,10 @@ func SaveSettings(s *AppSettings) error {
 }
 
 func updateGnomeKeybinding(keybinding string) {
-	// The extension reads from org.gnome.shell.extensions.clipboard-go toggle-clipboard-go
+	// The extension reads from org.gnome.shell.extensions.clipboard-gnome toggle-clipboard-gnome
 	// Let's attempt to set it via gsettings
 	formattedKey := "['" + keybinding + "']"
-	cmd := exec.Command("gsettings", "set", "org.gnome.shell.extensions.clipboard-go", "toggle-clipboard-go", formattedKey)
+	cmd := exec.Command("gsettings", "set", "org.gnome.shell.extensions.clipboard-gnome", "toggle-clipboard-gnome", formattedKey)
 	err := cmd.Run()
 	if err != nil {
 		logger.Warn("Failed to update gsettings keybinding: %v (May require schema compilation)", err)

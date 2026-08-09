@@ -1,8 +1,8 @@
 #!/bin/bash
-echo "Clipboard-Go Uninstallation Script"
+echo "Clipboard-Gnome Uninstallation Script"
 echo "----------------------------------"
 
-STATE_DIR="$HOME/.local/state/clipboard-go"
+STATE_DIR="$HOME/.local/state/clipboard-gnome"
 DB_PATH="$STATE_DIR/clipboard.db"
 DESKTOP_DIR="$HOME/Desktop"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
@@ -35,9 +35,9 @@ fi
 
 # Remove application and extension
 echo "Removing application files..."
-rm -f "$HOME/.local/bin/clipboard-go"
-rm -f "$HOME/.config/autostart/clipboard-go.desktop"
-rm -rf "$HOME/.local/share/gnome-shell/extensions/clipboard-go@surya.dev"
+rm -f "$HOME/.local/bin/clipboard-gnome"
+rm -f "$HOME/.config/autostart/clipboard-gnome.desktop"
+rm -rf "$HOME/.local/share/gnome-shell/extensions/clipboard-gnome@surya.dev"
 
 # Note: We keep the state directory as backup, or user can remove it
 echo "Uninstallation Complete!"

@@ -1,6 +1,6 @@
-# Technical Specification: Clipboard-Go
+# Technical Specification: Clipboard-Gnome
 
-This document provides the exact technical constraints, interface contracts, and architectural skeletons required to implement the Clipboard-Go hybrid application. This spec is intended to be fed to an LLM or developer to implement the project modularly.
+This document provides the exact technical constraints, interface contracts, and architectural skeletons required to implement the Clipboard-Gnome hybrid application. This spec is intended to be fed to an LLM or developer to implement the project modularly.
 
 ## 1. System Interfaces & Contracts
 
@@ -36,7 +36,7 @@ Preparing to unpac
 ```
 
 ### 1.2 SQLite Database Schema (Go Backend)
-Database file path: `~/.local/state/clipboard-go/clipboard.db`
+Database file path: `~/.local/state/clipboard-gnome/clipboard.db`
 Driver: `modernc.org/sqlite` (CGO-free SQLite for Go)
 
 ```sql
@@ -139,7 +139,7 @@ func main() {
 	app := NewApp()
 
 	err := wails.Run(&options.App{
-		Title:  "Clipboard-Go",
+		Title:  "Clipboard-Gnome",
 		Width:  400,
 		Height: 600,
 		Frameless:         true,

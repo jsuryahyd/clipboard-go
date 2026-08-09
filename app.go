@@ -8,10 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"clipboard-go/internal/db"
-	"clipboard-go/internal/dbus"
-	"clipboard-go/internal/logger"
-	"clipboard-go/internal/settings"
+	"clipboard-gnome/internal/db"
+	"clipboard-gnome/internal/dbus"
+	"clipboard-gnome/internal/logger"
+	"clipboard-gnome/internal/settings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -38,7 +38,7 @@ func (a *App) startup(ctx context.Context) {
 		homeDir = "."
 	}
 
-	stateDir := filepath.Join(homeDir, ".local", "state", "clipboard-go")
+	stateDir := filepath.Join(homeDir, ".local", "state", "clipboard-gnome")
 	logPath := filepath.Join(stateDir, "app.log")
 	dbPath := filepath.Join(stateDir, "clipboard.db")
 
@@ -47,7 +47,7 @@ func (a *App) startup(ctx context.Context) {
 	if err != nil {
 		fmt.Printf("Error initializing logger: %v\n", err)
 	}
-	logger.Info("Starting Clipboard-Go Wails Core Engine...")
+	logger.Info("Starting Clipboard-Gnome Wails Core Engine...")
 
 	// 2. Initialize SQLite Database
 	database, err := db.InitDB(dbPath)
@@ -74,7 +74,7 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) shutdown(ctx context.Context) {
-	logger.Info("Shutting down Clipboard-Go backend...")
+	logger.Info("Shutting down Clipboard-Gnome backend...")
 	if a.dbusClient != nil {
 		a.dbusClient.Close()
 	}
@@ -150,12 +150,12 @@ func (a *App) ensureAutostart(homeDir string) {
 
 	execPath, err := os.Executable()
 	if err != nil {
-		execPath = "clipboard-go"
+		execPath = "clipboard-gnome"
 	}
 
 	desktopContent := fmt.Sprintf(`[Desktop Entry]
 Type=Application
-Name=Clipboard-Go
+Name=Clipboard-Gnome
 Comment=Hybrid Wayland Clipboard Manager
 Exec=%s --hidden
 Icon=clipboard
@@ -164,7 +164,7 @@ Categories=Utility;
 X-GNOME-Autostart-enabled=true
 `, execPath)
 
-	desktopPath := filepath.Join(autostartDir, "clipboard-go.desktop")
+	desktopPath := filepath.Join(autostartDir, "clipboard-gnome.desktop")
 	err = os.WriteFile(desktopPath, []byte(desktopContent), 0644)
 	if err != nil {
 		logger.Warn("Failed to write autostart desktop file: %v", err)

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/godbus/dbus/v5"
-	"clipboard-go/internal/logger"
+	"clipboard-gnome/internal/logger"
 )
 
 const (

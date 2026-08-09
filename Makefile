@@ -1,6 +1,6 @@
-# Makefile for Clipboard-Go
+# Makefile for Clipboard-Gnome
 
-EXTENSION_UUID = clipboard-go@surya.dev
+EXTENSION_UUID = clipboard-gnome@surya.dev
 EXTENSION_DIR = ~/.local/share/gnome-shell/extensions/$(EXTENSION_UUID)
 BUILD_DIR = build
 GO_BIN = $(shell which go)
@@ -21,13 +21,13 @@ build:
 	if command -v wails >/dev/null 2>&1; then \
 		wails build -clean; \
 	else \
-		go build -o build/bin/clipboard-go main.go app.go; \
+		go build -o build/bin/clipboard-gnome main.go app.go; \
 	fi
 
 extension:
 	@echo "==> Packaging GNOME Shell Extension..."
 	@mkdir -p $(BUILD_DIR)
-	@cd extension && zip -r ../$(BUILD_DIR)/clipboard-go-extension.zip .
+	@cd extension && zip -r ../$(BUILD_DIR)/clipboard-gnome-extension.zip .
 
 install: extension
 	@echo "==> Installing GNOME Shell Extension locally..."

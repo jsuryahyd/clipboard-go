@@ -28,7 +28,7 @@ type Logger struct {
 
 var globalLogger *Logger
 
-// InitLogger initializes logging to both file (~/.local/state/clipboard-go/app.log) and stdout.
+// InitLogger initializes logging to both file (~/.local/state/clipboard-gnome/app.log) and stdout.
 func InitLogger(logPath string, level LogLevel) (*Logger, error) {
 	dir := filepath.Dir(logPath)
 	if err := os.MkdirAll(dir, 0755); err != nil {

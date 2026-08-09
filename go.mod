@@ -1,4 +1,4 @@
-module clipboard-go
+module clipboard-gnome
 
 go 1.25.0
 

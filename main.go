@@ -13,6 +13,9 @@ import (
 //go:embed all:frontend
 var assets embed.FS
 
+//go:embed assets/appicon.png
+var icon []byte
+
 func main() {
 	app := NewApp()
 
@@ -33,6 +36,7 @@ func main() {
 		OnStartup:        app.startup,
 		OnShutdown:       app.shutdown,
 		Linux: &linux.Options{
+			Icon:                icon,
 			WindowIsTranslucent: true,
 			WebviewGpuPolicy:    linux.WebviewGpuPolicyAlways,
 		},
@@ -42,6 +46,6 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Error starting Clipboard-Go Wails application: %v", err)
+		log.Fatalf("Error starting Clipboard-Gnome Wails application: %v", err)
 	}
 }

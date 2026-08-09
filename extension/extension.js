@@ -24,20 +24,20 @@ const DBUS_IFACE = `
 
 export default class ClipboardExtension extends Extension {
     enable() {
-        console.log('[Clipboard-Go] Enabling extension bridge for GNOME 45+...');
+        console.log('[Clipboard-Gnome] Enabling extension bridge for GNOME 45+...');
         this._clipboard = St.Clipboard.get_default();
         this._lastContent = "";
         this._pollTimerId = 0;
         this._dbusImpl = null;
-        this._keybindingName = 'toggle-clipboard-go';
+        this._keybindingName = 'toggle-clipboard-gnome';
 
         // 1. Export DBus Interface on Session Bus
         try {
             this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(DBUS_IFACE, this);
             this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/ClipboardGo');
-            console.log('[Clipboard-Go] DBus interface exported at /org/gnome/Shell/Extensions/ClipboardGo');
+            console.log('[Clipboard-Gnome] DBus interface exported at /org/gnome/Shell/Extensions/ClipboardGo');
         } catch (e) {
-            console.error(`[Clipboard-Go] Error exporting DBus interface: ${e}`);
+            console.error(`[Clipboard-Gnome] Error exporting DBus interface: ${e}`);
         }
 
         // 2. Start Clipboard Polling
@@ -48,7 +48,7 @@ export default class ClipboardExtension extends Extension {
     }
 
     disable() {
-        console.log('[Clipboard-Go] Disabling extension bridge...');
+        console.log('[Clipboard-Gnome] Disabling extension bridge...');
 
         // 1. Stop Clipboard Polling
         this._stopClipboardMonitoring();
@@ -94,21 +94,21 @@ export default class ClipboardExtension extends Extension {
 
     _registerHotkey() {
         try {
-            const settings = this.getSettings('org.gnome.shell.extensions.clipboard-go');
+            const settings = this.getSettings('org.gnome.shell.extensions.clipboard-gnome');
             Main.wm.addKeybinding(
                 this._keybindingName,
                 settings,
                 Meta.KeyBindingFlags.NONE,
                 Shell.ActionMode.ALL,
                 () => {
-                    console.log('[Clipboard-Go] Global hotkey pressed, emitting ShowUI signal');
+                    console.log('[Clipboard-Gnome] Global hotkey pressed, emitting ShowUI signal');
                     if (this._dbusImpl) {
                         this._dbusImpl.emit_signal('ShowUI', null);
                     }
                 }
             );
         } catch (e) {
-            console.warn(`[Clipboard-Go] Keybinding warning: ${e}`);
+            console.warn(`[Clipboard-Gnome] Keybinding warning: ${e}`);
         }
     }
 
@@ -122,12 +122,12 @@ export default class ClipboardExtension extends Extension {
 
     // DBus Method: InjectPaste
     InjectPaste(type, content) {
-        console.log(`[Clipboard-Go] InjectPaste invoked (type=${type}, len=${content.length})`);
+        console.log(`[Clipboard-Gnome] InjectPaste invoked (type=${type}, len=${content.length})`);
         
         this._lastContent = content;
         this._clipboard.set_text(St.ClipboardType.CLIPBOARD, content);
 
-        console.warn('[Clipboard-Go] Auto-paste via Clutter synthetic event disabled to prevent GNOME Shell Wayland crash.');
+        console.warn('[Clipboard-Gnome] Auto-paste via Clutter synthetic event disabled to prevent GNOME Shell Wayland crash.');
         // The Go application should use 'wtype' or 'ydotool' to trigger Ctrl+V, 
         // as injecting Clutter key events from extensions is restricted and causes C segfaults.
     }

@@ -18,7 +18,7 @@ flowchart LR
         WM[GNOME Window Manager]
     end
 
-    subgraph Clipboard-Go App
+    subgraph Clipboard-Gnome App
         WB[Go Backend]
         DB[(SQLite DB)]
         WF[Wails Frontend HTML/JS]
@@ -50,12 +50,12 @@ Ensure the following tools are installed on your system before proceeding: `go`,
    The script will:
    - Build the Wails binary (`make build`)
    - Package and install the GNOME Extension (`make install`)
-   - Copy the binary to `~/.local/bin/clipboard-go`
+   - Copy the binary to `~/.local/bin/clipboard-gnome`
 
 3. **Restart GNOME Shell**: 
    - Press `Alt+F2`, type `r`, and hit Enter (X11 only) or logout and log back in (Wayland).
-4. **Enable the Extension**: Open the *Extensions* app or use the GNOME Extensions website to enable the `clipboard-go@surya.dev` extension.
-5. **Auto-Start**: On its first run, `clipboard-go` will automatically add an autostart entry (`~/.config/autostart/clipboard-go.desktop`) so it runs seamlessly in the background on subsequent boots.
+4. **Enable the Extension**: Open the *Extensions* app or use the GNOME Extensions website to enable the `clipboard-gnome@surya.dev` extension.
+5. **Auto-Start**: On its first run, `clipboard-gnome` will automatically add an autostart entry (`~/.config/autostart/clipboard-gnome.desktop`) so it runs seamlessly in the background on subsequent boots.
 
 ## TODOs
 1. **Images not saved**: Currently, images copied to the clipboard are not displaying in the UI. GNOME shell's `St.Clipboard.get_text()` does not read image data. The extension logic needs to be updated to handle mimetypes like `image/png` properly.

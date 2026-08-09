@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Clipboard-Go Installation Script"
+echo "Clipboard-Gnome Installation Script"
 echo "--------------------------------"
 
 # Check and install dependencies
@@ -21,12 +21,12 @@ echo "Dependencies satisfied."
 
 # Note about startup application
 echo ""
-echo "NOTE: Clipboard-Go will automatically add itself to your startup applications upon first launch."
-echo "An autostart entry will be created at ~/.config/autostart/clipboard-go.desktop."
+echo "NOTE: Clipboard-Gnome will automatically add itself to your startup applications upon first launch."
+echo "An autostart entry will be created at ~/.config/autostart/clipboard-gnome.desktop."
 echo ""
 
 # Build
-echo "Building Clipboard-Go..."
+echo "Building Clipboard-Gnome..."
 make build
 
 # Install Extension
@@ -36,7 +36,10 @@ make install
 # Copy binary to path
 echo "Installing binary to ~/.local/bin..."
 mkdir -p ~/.local/bin
-cp build/bin/clipboard-go ~/.local/bin/clipboard-go
+cp build/bin/clipboard-gnome ~/.local/bin/clipboard-gnome
+
+echo "Starting Clipboard-Gnome..."
+nohup ~/.local/bin/clipboard-gnome > /dev/null 2>&1 &
 
 echo "Installation Complete!"
 echo "Please restart GNOME Shell (Alt+F2, r, Enter or logout/login) and enable the extension."

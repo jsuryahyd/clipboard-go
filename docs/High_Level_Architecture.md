@@ -1,4 +1,4 @@
-# Implementation Plan: Clipboard-Go (Hybrid Architecture)
+# Implementation Plan: Clipboard-Gnome (Hybrid Architecture)
 
 ## Testing & Validation Strategy
 To validate our hybrid architecture assumptions early, we will test the GNOME Extension independently at the end of **Phase 1**, before any UI or Database code is written.
@@ -13,8 +13,8 @@ To validate our hybrid architecture assumptions early, we will test the GNOME Ex
 5. **Hotkey Registration**: Register the global shortcut (`Super+Shift+V`) inside the extension, which emits a DBus signal (`ShowUI`) to wake the Wails app.
 
 ## Phase 2: Wails Core, Database & Logging
-1. **Initialize Project**: Scaffold the Wails project using a lightweight template (`wails init -n clipboard-go -t vanilla-ts`).
-2. **Logging Infrastructure**: Integrate a rotating structured logger (e.g., `lumberjack` + `zerolog`) writing to `~/.local/state/clipboard-go/app.log` for comprehensive debug and error tracing.
+1. **Initialize Project**: Scaffold the Wails project using a lightweight template (`wails init -n clipboard-gnome -t vanilla-ts`).
+2. **Logging Infrastructure**: Integrate a rotating structured logger (e.g., `lumberjack` + `zerolog`) writing to `~/.local/state/clipboard-gnome/app.log` for comprehensive debug and error tracing.
 3. **Database Setup**: Integrate a lightweight SQLite driver (e.g., `modernc.org/sqlite`). Implement schema for `ClipboardItems` and `Tags`.
 4. **Data Retention & Cleanup**: Create a background goroutine that runs on launch and periodically to:
    - Delete items older than the 30-day retention limit.
@@ -23,7 +23,7 @@ To validate our hybrid architecture assumptions early, we will test the GNOME Ex
 5. **DBus Client**: Use the `godbus/dbus` Go library to connect to the session bus, listen to `ClipboardChanged`, store data in SQLite, and listen to `ShowUI`.
 
 ## Phase 3: Window Management & OS Integration
-1. **Autostart Registration**: Implement Go logic to programmatically write a `clipboard-go.desktop` file to `~/.config/autostart/`, ensuring the Wails daemon boots silently on user login.
+1. **Autostart Registration**: Implement Go logic to programmatically write a `clipboard-gnome.desktop` file to `~/.config/autostart/`, ensuring the Wails daemon boots silently on user login.
 2. **System Tray Integration**: Utilize Wails' application menu (which binds to AppIndicator/libayatana on Linux) to render the tray icon with basic controls (Quit, Settings, Clear History, Incognito).
 3. **Window Summoning**: Configure the Wails application window to be frameless, hide on blur, and spawn exactly at the mouse pointer's coordinates upon receiving the `ShowUI` signal.
 

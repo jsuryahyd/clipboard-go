@@ -3,7 +3,7 @@ build/
 bin/
 dist/
 *.zip
-clipboard-go
+clipboard-gnome
 
 # State / Runtime files
 app.log

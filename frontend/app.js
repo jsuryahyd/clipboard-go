@@ -1,4 +1,4 @@
-// Clipboard-Go Frontend Controller
+// Clipboard-Gnome Frontend Controller
 
 let uiMode = localStorage.getItem('uiMode') || 'list';
 let previewTimeout = null;

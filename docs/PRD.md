@@ -1,7 +1,7 @@
-# Product Requirements Document (PRD): Clipboard-Go
+# Product Requirements Document (PRD): Clipboard-Gnome
 
 ## 1. Overview
-Clipboard-Go is a high-performance, hybrid clipboard manager for Linux. It combines a **headless GNOME Shell Extension** (handling unprivileged Wayland interactions) with a **standalone Go/Wails Application** (handling UI, database, and background processing). This architecture achieves the best of both worlds: perfect OS integration without freezing the desktop environment.
+Clipboard-Gnome is a high-performance, hybrid clipboard manager for Linux. It combines a **headless GNOME Shell Extension** (handling unprivileged Wayland interactions) with a **standalone Go/Wails Application** (handling UI, database, and background processing). This architecture achieves the best of both worlds: perfect OS integration without freezing the desktop environment.
 
 ## 2. Target Audience
 Linux power users, developers, and professionals who require a reliable clipboard history manager with premium aesthetics and flawless Wayland support, without the system freezes associated with traditional GNOME extensions.
@@ -30,7 +30,7 @@ To ensure long-term stability and prevent disk bloat, the application will enfor
 ## 6. System Integration & Observability
 - **Startup App**: The application automatically creates a `.desktop` file in `~/.config/autostart/` so the Wails daemon starts silently in the background upon user login.
 - **System Tray**: A persistent system tray icon (utilizing AppIndicator/libayatana bindings provided by Wails) allows quick access to settings, incognito toggle, clear history, and manual quitting.
-- **Diagnostics & Logging**: Comprehensive debug and error logging implemented using a structured logger (e.g., `rs/zerolog` + `lumberjack`). Logs are rotated and persistently stored in `~/.local/state/clipboard-go/app.log` for easy troubleshooting and user bug reports.
+- **Diagnostics & Logging**: Comprehensive debug and error logging implemented using a structured logger (e.g., `rs/zerolog` + `lumberjack`). Logs are rotated and persistently stored in `~/.local/state/clipboard-gnome/app.log` for easy troubleshooting and user bug reports.
 
 ## 7. Key Linux Pitfalls Avoided (Derived from Copyous)
 1. **Desktop Environment Freezes**: *Solved*. The GNOME Extension does zero data processing. All SQLite/UI tasks are offloaded to Wails.

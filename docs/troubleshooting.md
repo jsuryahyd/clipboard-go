@@ -1,6 +1,6 @@
-# Clipboard-Go Troubleshooting & Known Gotchas
+# Clipboard-Gnome Troubleshooting & Known Gotchas
 
-This document outlines several operating system and GNOME-specific issues encountered during the development of Clipboard-Go. These are edge-cases and security restrictions that are often undocumented or non-obvious, even for experienced desktop developers.
+This document outlines several operating system and GNOME-specific issues encountered during the development of Clipboard-Gnome. These are edge-cases and security restrictions that are often undocumented or non-obvious, even for experienced desktop developers.
 
 ## 1. Wayland Security & Synthetic Input (The "Log-Out Crash")
 
@@ -17,8 +17,8 @@ This document outlines several operating system and GNOME-specific issues encoun
 ## 3. Global Hotkeys & GSettings Schemas
 
 **Issue:** Registering a global hotkey via `Main.wm.addKeybinding` fails synchronously, and the extension refuses to enable.
-**Why:** The extension attempts to register the hotkey against the default `org.gnome.shell.keybindings` schema. If your custom hotkey key (e.g., `toggle-clipboard-go`) does not exist in that schema natively, GNOME throws a fatal GSettings error.
-**Solution:** The extension must ship with its own compiled GSettings schema (`schemas/org.gnome.shell.extensions.clipboard-go.gschema.xml`). 
+**Why:** The extension attempts to register the hotkey against the default `org.gnome.shell.keybindings` schema. If your custom hotkey key (e.g., `toggle-clipboard-gnome`) does not exist in that schema natively, GNOME throws a fatal GSettings error.
+**Solution:** The extension must ship with its own compiled GSettings schema (`schemas/org.gnome.shell.extensions.clipboard-gnome.gschema.xml`). 
 *Note:* You must compile it using `glib-compile-schemas schemas/`. In modern ES modules for GNOME 45+, use `this.getSettings('your.schema.id')` to load it.
 
 ## 4. Extension Updates Require a Shell Restart
@@ -32,7 +32,7 @@ This document outlines several operating system and GNOME-specific issues encoun
 ## 5. UI Window Disappears on "Copy/Paste" Click
 
 **Issue:** Clicking an item in the Wails history grid causes the window to immediately disappear.
-**Why:** This is intended behavior, but can look like a crash if the subsequent DBus paste fails. To inject a paste (`Ctrl+V`) into a target application (like a terminal or browser), the Clipboard-Go window must yield keyboard focus *before* the paste is simulated.
+**Why:** This is intended behavior, but can look like a crash if the subsequent DBus paste fails. To inject a paste (`Ctrl+V`) into a target application (like a terminal or browser), the Clipboard-Gnome window must yield keyboard focus *before* the paste is simulated.
 **Solution:** `runtime.WindowHide(ctx)` is called immediately on click. Ensure the DBus `InjectPaste` call and the `wtype`/`xdotool` execution happen *after* the window is hidden.
 
 ## 6. Wails CLI "Command Not Found"
