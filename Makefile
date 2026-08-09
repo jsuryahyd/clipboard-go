@@ -16,7 +16,8 @@ test:
 
 build:
 	@echo "==> Building Wails binary..."
-	@export PATH=/home/linuxbrew/.linuxbrew/bin:$(HOME)/go/bin:$(PATH); \
+	@export PKG_CONFIG_PATH=/home/linuxbrew/.linuxbrew/lib/pkgconfig:$$PKG_CONFIG_PATH; \
+	export PATH=/home/linuxbrew/.linuxbrew/bin:$(HOME)/go/bin:$(PATH); \
 	if command -v wails >/dev/null 2>&1; then \
 		wails build -clean; \
 	else \
