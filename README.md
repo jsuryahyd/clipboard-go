@@ -52,5 +52,9 @@ Ensure the following tools are installed on your system before proceeding: `go`,
 4. **Enable the Extension**: Open the *Extensions* app or use the GNOME Extensions website to enable the `clipboard-go@surya.dev` extension.
 5. **Auto-Start**: On its first run, `clipboard-go` will automatically add an autostart entry (`~/.config/autostart/clipboard-go.desktop`) so it runs seamlessly in the background on subsequent boots.
 
+## TODOs
+1. **Images not saved**: Currently, images copied to the clipboard are not displaying in the UI. GNOME shell's `St.Clipboard.get_text()` does not read image data. The extension logic needs to be updated to handle mimetypes like `image/png` properly.
+2. **Code quality improvements**: See [code-quality-todo.md](./code-quality-todo.md) for a list of incoming refactors and improvements.
+
 ## Unlicensed
 This project was built with AI and is unlicensed. You are free to use, modify, and distribute it as you want.
