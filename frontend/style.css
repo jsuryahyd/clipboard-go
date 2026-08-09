@@ -304,13 +304,13 @@ body {
 }
 
 .badge-text {
-    background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent-indigo);
 }
 
 .badge-image {
-    background: rgba(236, 72, 153, 0.2);
-    color: #f472b6;
+    background: rgba(236, 72, 153, 0.15);
+    color: var(--accent-gradient-alt);
 }
 
 .item-time {
