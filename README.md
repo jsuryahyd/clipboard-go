@@ -54,7 +54,8 @@ Ensure the following tools are installed on your system before proceeding: `go`,
 
 ## TODOs
 1. **Images not saved**: Currently, images copied to the clipboard are not displaying in the UI. GNOME shell's `St.Clipboard.get_text()` does not read image data. The extension logic needs to be updated to handle mimetypes like `image/png` properly.
-2. **Code quality improvements**: See [code-quality-todo.md](./code-quality-todo.md) for a list of incoming refactors and improvements.
+2. **Code quality improvements**: See [docs/code-quality-todo.md](./docs/code-quality-todo.md) for a list of incoming refactors and improvements.
+3. **Reference implementations**: We can learn practical issues and potential edge cases from existing clipboard libraries like the `copyous` project.
 
 ## Unlicensed
 This project was built with AI and is unlicensed. You are free to use, modify, and distribute it as you want.
