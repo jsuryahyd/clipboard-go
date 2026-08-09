@@ -19,16 +19,107 @@ const filterPills = document.querySelectorAll('.filter-pill');
 const toast = document.getElementById('toast');
 const toastMessage = document.getElementById('toast-message');
 
+const confirmModal = document.getElementById('confirm-modal');
+const btnModalCancel = document.getElementById('btn-modal-cancel');
+const btnModalConfirm = document.getElementById('btn-modal-confirm');
+
+const btnSettings = document.getElementById('btn-settings');
+const settingsModal = document.getElementById('settings-modal');
+const btnSettingsCancel = document.getElementById('btn-settings-cancel');
+const btnSettingsSave = document.getElementById('btn-settings-save');
+const inputRetention = document.getElementById('set-retention');
+const inputMaxSize = document.getElementById('set-max-size');
+const inputKeybind = document.getElementById('set-keybind');
+const inputDualTone = document.getElementById('set-dual-tone');
+const inputThemeColor = document.getElementById('set-theme-color');
+const inputRounding = document.getElementById('set-rounding');
+
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+    
+    inputDualTone.addEventListener('change', () => {
+        updateThemeDropdown(inputThemeColor.value);
+    });
 });
 
 async function initApp() {
     setupEventListeners();
     setupWailsEventListeners();
     await checkIncognitoState();
+    await applySavedTheme();
     await loadHistory();
     focusSearch();
+}
+
+async function applySavedTheme() {
+    try {
+        if (window.go && window.go.main && window.go.main.App) {
+            const s = await window.go.main.App.GetSettings();
+            if (s) {
+                applyThemeToDOM(s);
+            }
+        }
+    } catch (e) {
+        console.error("Error loading theme on startup:", e);
+    }
+}
+
+const singleToneThemes = {
+    midnight: { bg: 'rgba(15, 23, 42, 0.94)', card: 'rgba(15, 23, 42, 0.6)', accent: '#6366f1' },
+    pitch:    { bg: 'rgba(0, 0, 0, 0.94)',    card: 'rgba(0, 0, 0, 0.6)',    accent: '#3b82f6' },
+    charcoal: { bg: 'rgba(28, 25, 23, 0.94)', card: 'rgba(28, 25, 23, 0.6)', accent: '#f59e0b' }
+};
+
+const dualToneThemes = {
+    tokyo:    { bg: 'rgba(26, 27, 38, 0.94)', card: 'rgba(36, 40, 59, 0.7)', accent: '#7aa2f7' },
+    dracula:  { bg: 'rgba(40, 42, 54, 0.94)', card: 'rgba(68, 71, 90, 0.7)', accent: '#bd93f9' },
+    nord:     { bg: 'rgba(46, 52, 64, 0.94)', card: 'rgba(59, 66, 82, 0.7)', accent: '#88c0d0' },
+    slate:    { bg: 'rgba(15, 23, 42, 0.94)', card: 'rgba(30, 41, 59, 0.7)', accent: '#6366f1' }
+};
+
+function updateThemeDropdown(selectedValue) {
+    inputThemeColor.innerHTML = '';
+    const themes = inputDualTone.checked ? dualToneThemes : singleToneThemes;
+    
+    let found = false;
+    for (const key of Object.keys(themes)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+        inputThemeColor.appendChild(opt);
+        if (key === selectedValue) found = true;
+    }
+    
+    if (found) {
+        inputThemeColor.value = selectedValue;
+    } else {
+        inputThemeColor.selectedIndex = 0;
+    }
+}
+
+function applyThemeToDOM(s) {
+    const root = document.documentElement;
+    
+    // Apply Border Radius
+    root.style.setProperty('--radius-md', `${s.border_radius}px`);
+    root.style.setProperty('--radius-sm', `${Math.max(2, s.border_radius - 4)}px`);
+    root.style.setProperty('--radius-lg', `${s.border_radius + 4}px`);
+
+    const themes = s.is_dual_tone ? dualToneThemes : singleToneThemes;
+    const t = themes[s.theme_color] || Object.values(themes)[0];
+    
+    root.style.setProperty('--bg-main', t.bg);
+    root.style.setProperty('--bg-card', t.card);
+    root.style.setProperty('--accent-indigo', t.accent);
+    
+    // Header/app background sync
+    const appContainer = document.querySelector('.app-container');
+    const header = document.querySelector('.header');
+    const footer = document.querySelector('.footer');
+    
+    if (appContainer) appContainer.style.background = t.bg;
+    if (header) header.style.background = s.is_dual_tone ? 'rgba(15, 23, 42, 0.2)' : 'transparent';
+    if (footer) footer.style.background = s.is_dual_tone ? 'rgba(15, 23, 42, 0.4)' : 'transparent';
 }
 
 function setupEventListeners() {
@@ -64,9 +155,54 @@ function setupEventListeners() {
     // Header Action Buttons
     btnIncognito.addEventListener('click', toggleIncognito);
     btnClear.addEventListener('click', clearHistory);
+    btnSettings.addEventListener('click', openSettings);
     btnClose.addEventListener('click', () => {
         if (window.go && window.go.main && window.go.main.App) {
             window.go.main.App.HideWindow();
+        }
+    });
+
+    // Modal Actions
+    btnModalCancel.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+    });
+
+    btnModalConfirm.addEventListener('click', async () => {
+        confirmModal.classList.add('hidden');
+        try {
+            if (window.go && window.go.main && window.go.main.App) {
+                await window.go.main.App.ClearHistory();
+                showToast("History cleared");
+                await loadHistory();
+            }
+        } catch (e) {
+            console.error("Clear history error:", e);
+        }
+    });
+
+    // Settings Modal
+    btnSettingsCancel.addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+    });
+
+    btnSettingsSave.addEventListener('click', async () => {
+        settingsModal.classList.add('hidden');
+        try {
+            if (window.go && window.go.main && window.go.main.App) {
+                const s = {
+                    retention_days: parseInt(inputRetention.value) || 30,
+                    max_item_size_mb: parseInt(inputMaxSize.value) || 10,
+                    keybinding: inputKeybind.value || "<Super>c",
+                    is_dual_tone: inputDualTone.checked,
+                    theme_color: inputThemeColor.value || "indigo",
+                    border_radius: parseInt(inputRounding.value) || 10
+                };
+                await window.go.main.App.SaveSettings(s);
+                applyThemeToDOM(s);
+                showToast("Settings saved");
+            }
+        } catch (e) {
+            console.error("Save settings error:", e);
         }
     });
 
@@ -353,16 +489,27 @@ async function deleteItem(id) {
 }
 
 async function clearHistory() {
-    if (!confirm("Clear all unpinned clipboard history?")) return;
+    confirmModal.classList.remove('hidden');
+}
+
+async function openSettings() {
     try {
         if (window.go && window.go.main && window.go.main.App) {
-            await window.go.main.App.ClearHistory();
-            showToast("History cleared");
-            await loadHistory();
+            const s = await window.go.main.App.GetSettings();
+            if (s) {
+                inputRetention.value = s.retention_days;
+                inputMaxSize.value = s.max_item_size_mb;
+                inputKeybind.value = s.keybinding;
+                inputDualTone.checked = s.is_dual_tone;
+                updateThemeDropdown(s.theme_color);
+                inputThemeColor.value = s.theme_color;
+                inputRounding.value = s.border_radius;
+            }
         }
     } catch (e) {
-        console.error("Clear history error:", e);
+        console.error("Get settings error:", e);
     }
+    settingsModal.classList.remove('hidden');
 }
 
 function isCodeSnippet(str) {

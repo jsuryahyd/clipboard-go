@@ -10,6 +10,7 @@
     --text-muted: #64748b;
     --accent-indigo: #6366f1;
     --accent-indigo-hover: #4f46e5;
+    --accent-gradient-alt: #a855f7;
     --accent-star: #fbbf24;
     --accent-danger: #ef4444;
     --radius-sm: 6px;
@@ -78,7 +79,7 @@ body {
     justify-content: center;
     width: 28px;
     height: 28px;
-    background: linear-gradient(135deg, var(--accent-indigo), #a855f7);
+    background: linear-gradient(135deg, var(--accent-indigo), var(--accent-gradient-alt));
     border-radius: var(--radius-sm);
     color: #fff;
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
@@ -356,11 +357,20 @@ body {
     color: var(--text-primary);
     line-height: 1.4;
     word-break: break-word;
-    max-height: 60px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    max-height: 80px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.item-content::-webkit-scrollbar {
+    width: 4px;
+}
+.item-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+.item-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .item-content.code-snippet {
@@ -461,3 +471,194 @@ kbd {
 .hidden {
     display: none !important;
 }
+
+/* --- Modal --- */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    width: 85%;
+    max-width: 300px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transition: background 0.15s ease;
+}
+
+.modal-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.modal-btn.danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-danger);
+}
+
+.modal-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+.modal-btn.primary {
+    background: var(--accent-indigo);
+    color: white;
+}
+
+.modal-btn.primary:hover {
+    background: var(--accent-indigo-hover);
+}
+
+.settings-content {
+    max-width: 340px;
+    text-align: left;
+}
+
+.settings-content h3 {
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font-mono);
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--accent-indigo);
+}
+
+.form-group select {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font-main);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+
+.form-group select:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-group select option {
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--text-primary);
+}
+
+.theme-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.theme-section h4 {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.row-group {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.sub-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.help-text {
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+

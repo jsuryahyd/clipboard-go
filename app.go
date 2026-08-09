@@ -11,6 +11,7 @@ import (
 	"clipboard-go/internal/db"
 	"clipboard-go/internal/dbus"
 	"clipboard-go/internal/logger"
+	"clipboard-go/internal/settings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -116,8 +117,12 @@ func (a *App) onShowUI() {
 }
 
 func (a *App) startMaintenanceLoop() {
+	s := settings.LoadSettings()
+	retentionDays := s.RetentionDays
+	maxSizeBytes := int64(s.MaxItemSizeMB * 1024 * 1024)
+
 	if a.database != nil {
-		deleted, err := a.database.Cleanup(30, 10*1024*1024)
+		deleted, err := a.database.Cleanup(retentionDays, maxSizeBytes)
 		if err != nil {
 			logger.Error("DB Cleanup error: %v", err)
 		} else {
@@ -127,8 +132,9 @@ func (a *App) startMaintenanceLoop() {
 
 	ticker := time.NewTicker(24 * time.Hour)
 	for range ticker.C {
+		s = settings.LoadSettings()
 		if a.database != nil {
-			deleted, err := a.database.Cleanup(30, 10*1024*1024)
+			deleted, err := a.database.Cleanup(s.RetentionDays, int64(s.MaxItemSizeMB*1024*1024))
 			if err != nil {
 				logger.Error("Periodic DB cleanup error: %v", err)
 			} else {
@@ -280,3 +286,12 @@ func (a *App) GetStats() map[string]interface{} {
 	stats["incognito"] = a.IsIncognito()
 	return stats
 }
+
+func (a *App) GetSettings() *settings.AppSettings {
+	return settings.LoadSettings()
+}
+
+func (a *App) SaveSettings(s *settings.AppSettings) error {
+	return settings.SaveSettings(s)
+}
+

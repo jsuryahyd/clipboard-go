@@ -18,6 +18,10 @@ export function GetHistory(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['GetHistory'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
+}
+
 export function GetStats() {
   return window['go']['main']['App']['GetStats']();
 }
@@ -32,6 +36,10 @@ export function IsIncognito() {
 
 export function RemoveTag(arg1, arg2) {
   return window['go']['main']['App']['RemoveTag'](arg1, arg2);
+}
+
+export function SaveSettings(arg1) {
+  return window['go']['main']['App']['SaveSettings'](arg1);
 }
 
 export function ToggleIncognito() {

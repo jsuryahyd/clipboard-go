@@ -4,3 +4,58 @@ Clipboard-Go is a fast, hybrid Wayland/X11 clipboard manager built with Go and W
 
 ## Unlicensed
 This project was built with AI and is unlicensed. You are free to use, modify, and distribute it as you want.
+
+## Architecture
+
+Clipboard-Go utilizes a hybrid architecture bridging GNOME Shell with a Wails application via DBus to bypass Wayland clipboard isolation restrictions.
+
+```mermaid
+flowchart LR
+    subgraph GNOME Desktop
+        GE[GNOME Extension]
+        WM[GNOME Window Manager]
+    end
+
+    subgraph Clipboard-Go App
+        WB[Go Backend]
+        DB[(SQLite DB)]
+        WF[Wails Frontend HTML/JS]
+    end
+    
+    GE -- "Listens to St.Clipboard" --> GE
+    GE -- "Emits DBus Signal" --> WB
+    WB -- "Stores item" --> DB
+    GE -- "Hotkey (Super+C) ShowUI" --> WB
+    WB -- "Window Unminimise" --> WF
+    WF -- "Select & Paste" --> WB
+    WB -- "InjectPaste(type, content)" --> GE
+    GE -- "Sets Clipboard & Mocks Paste" --> WM
+```
+
+## Installation
+
+An installation script is provided in the repository to build and install the necessary components automatically.
+
+### Dependencies
+Ensure the following tools are installed on your system before proceeding:
+- `go`
+- `npm`
+- `sqlite3`
+- `zip` & `unzip`
+- `curl`
+
+### Steps
+1. Clone this repository and navigate to the root directory.
+2. Run the installation script:
+   ```bash
+   ./install.sh
+   ```
+   The script will:
+   - Build the Wails binary (`make build`)
+   - Package and install the GNOME Extension (`make install`)
+   - Copy the binary to `~/.local/bin/clipboard-go`
+
+3. **Restart GNOME Shell**: 
+   - Press `Alt+F2`, type `r`, and hit Enter (X11 only) or logout and log back in (Wayland).
+4. **Enable the Extension**: Open the *Extensions* app or use the GNOME Extensions website to enable the `clipboard-go@surya.dev` extension.
+5. **Auto-Start**: On its first run, `clipboard-go` will automatically add an autostart entry (`~/.config/autostart/clipboard-go.desktop`) so it runs seamlessly in the background on subsequent boots.

@@ -35,6 +35,12 @@
                             <line x1="1" y1="1" x2="23" y2="23"></line>
                         </svg>
                     </button>
+                    <button id="btn-settings" class="icon-btn" title="Settings">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
                     <button id="btn-clear" class="icon-btn danger-hover" title="Clear Unpinned History">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -102,6 +108,71 @@
                 <span><kbd>Esc</kbd> hide</span>
             </div>
         </footer>
+
+        <!-- Modal Overlay -->
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3>Clear History</h3>
+                <p>Are you sure you want to clear all unpinned clipboard history?</p>
+                <div class="modal-actions">
+                    <button id="btn-modal-cancel" class="modal-btn">Cancel</button>
+                    <button id="btn-modal-confirm" class="modal-btn danger">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal Overlay -->
+        <div id="settings-modal" class="modal-overlay hidden">
+            <div class="modal-content settings-content">
+                <h3>Preferences</h3>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="set-retention">Retention Days</label>
+                        <input type="number" id="set-retention" min="1" max="365">
+                        <span class="help-text">Unpinned items older than this will be deleted.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="set-max-size">Max Item Size (MB)</label>
+                        <input type="number" id="set-max-size" min="1" max="100">
+                        <span class="help-text">Items larger than this will be ignored.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="set-keybind">GNOME Hotkey</label>
+                        <input type="text" id="set-keybind" placeholder="e.g. <Super>c">
+                        <span class="help-text">Only works for GNOME. Requires system restart or GNOME shell restart to apply changes. Make sure this keybinding is not used already!</span>
+                    </div>
+                    
+                    <div class="theme-section">
+                        <h4>Appearance</h4>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="set-dual-tone"> Dual Tone Colors
+                            </label>
+                        </div>
+                        <div class="form-group row-group">
+                            <div class="sub-group">
+                                <label for="set-theme-color">Color Theme</label>
+                                <select id="set-theme-color">
+                                    <option value="indigo">Indigo</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="purple">Purple</option>
+                                    <option value="emerald">Emerald</option>
+                                    <option value="rose">Rose</option>
+                                </select>
+                            </div>
+                            <div class="sub-group">
+                                <label for="set-rounding">Box Rounding (px)</label>
+                                <input type="number" id="set-rounding" min="2" max="20" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="btn-settings-cancel" class="modal-btn">Cancel</button>
+                    <button id="btn-settings-save" class="modal-btn primary">Save</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Toast Notification -->
         <div id="toast" class="toast hidden">
