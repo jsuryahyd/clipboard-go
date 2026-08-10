@@ -88,7 +88,10 @@
         <!-- History Item List -->
         <main class="list-container">
             <div id="item-list" class="item-list">
-                <!-- Items populated dynamically -->
+                <!-- List mode items populated dynamically -->
+            </div>
+            <div id="item-cards" class="item-list hidden">
+                <!-- Cards mode items populated dynamically -->
             </div>
 
             <div id="empty-state" class="empty-state hidden">
@@ -193,8 +196,16 @@
         <!-- Preview Popup (List Mode) -->
         <div id="preview-popup" class="preview-popup hidden">
             <div class="preview-header">
-                <span id="preview-type" class="badge"></span>
-                <span id="preview-time" class="item-time"></span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span id="preview-type" class="badge"></span>
+                    <span id="preview-time" class="item-time"></span>
+                </div>
+                <button id="btn-preview-delete" class="icon-btn danger-hover" title="Delete" style="padding: 2px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <div id="preview-content" class="preview-body"></div>
         </div>

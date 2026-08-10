@@ -7,11 +7,13 @@ let selectedIndex = 0;
 let activeFilter = 'all'; // 'all', 'pinned', 'text', 'image'
 let searchQuery = '';
 let isIncognito = false;
+let currentPreviewId = null;
 
 // DOM Elements
 const searchInput = document.getElementById('search-input');
 const btnClearSearch = document.getElementById('btn-clear-search');
 const itemList = document.getElementById('item-list');
+const itemCards = document.getElementById('item-cards');
 const emptyState = document.getElementById('empty-state');
 const btnIncognito = document.getElementById('btn-incognito');
 const incognitoBanner = document.getElementById('incognito-banner');
@@ -40,6 +42,7 @@ const previewPopup = document.getElementById('preview-popup');
 const previewType = document.getElementById('preview-type');
 const previewTime = document.getElementById('preview-time');
 const previewContent = document.getElementById('preview-content');
+const btnPreviewDelete = document.getElementById('btn-preview-delete');
 const listContainer = document.querySelector('.list-container');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,9 +67,13 @@ function applyUIMode() {
     if (uiMode === 'list') {
         listContainer.classList.add('list-mode');
         itemList.classList.add('list-mode');
+        itemList.classList.remove('hidden');
+        itemCards.classList.add('hidden');
     } else {
         listContainer.classList.remove('list-mode');
         itemList.classList.remove('list-mode');
+        itemList.classList.add('hidden');
+        itemCards.classList.remove('hidden');
         hidePreview();
     }
 }
@@ -240,7 +247,7 @@ function setupEventListeners() {
     });
 
     // Event Delegation for list items
-    itemList.addEventListener('click', (e) => {
+    listContainer.addEventListener('click', (e) => {
         const card = e.target.closest('.item-card');
         if (!card) return;
         const id = parseInt(card.dataset.id);
@@ -256,24 +263,31 @@ function setupEventListeners() {
         selectAndPaste(id);
     });
 
-    itemList.addEventListener('mouseover', (e) => {
+    listContainer.addEventListener('mouseover', (e) => {
         const card = e.target.closest('.item-card');
         if (card && uiMode === 'list') {
-            const id = parseInt(card.dataset.id);
-            const item = historyItems.find(i => i.id === id);
-            if (item) {
+            if (!e.relatedTarget || !card.contains(e.relatedTarget)) {
+                const id = parseInt(card.dataset.id);
+                const item = historyItems.find(i => i.id === id);
+                if (item) {
+                    hidePreview();
+                    clearTimeout(hideTimeout);
+                    clearTimeout(previewTimeout);
+                    previewTimeout = setTimeout(() => showPreview(item, card), 800);
+                }
+            } else {
                 clearTimeout(hideTimeout);
-                clearTimeout(previewTimeout);
-                previewTimeout = setTimeout(() => showPreview(item, card), 800);
             }
         }
     });
 
-    itemList.addEventListener('mouseout', (e) => {
+    listContainer.addEventListener('mouseout', (e) => {
         const card = e.target.closest('.item-card');
         if (card && uiMode === 'list') {
-            clearTimeout(previewTimeout);
-            hideTimeout = setTimeout(() => hidePreview(), 100);
+            if (!e.relatedTarget || !card.contains(e.relatedTarget)) {
+                clearTimeout(previewTimeout);
+                hideTimeout = setTimeout(() => hidePreview(), 50);
+            }
         }
     });
 
@@ -375,93 +389,109 @@ async function loadHistory() {
 function renderItems() {
     if (historyItems.length === 0) {
         itemList.innerHTML = '';
+        itemCards.innerHTML = '';
         emptyState.classList.remove('hidden');
         return;
     }
 
     emptyState.classList.add('hidden');
 
-    const existingCards = Array.from(itemList.querySelectorAll('.item-card'));
-    const cardsMap = new Map(existingCards.map(c => [c.dataset.id, c]));
-    const fragment = document.createDocumentFragment();
+    const existingListCards = Array.from(itemList.querySelectorAll('.item-card'));
+    const listCardsMap = new Map(existingListCards.map(c => [c.dataset.id, c]));
+    const listFragment = document.createDocumentFragment();
+
+    const existingCardsCards = Array.from(itemCards.querySelectorAll('.item-card'));
+    const cardsCardsMap = new Map(existingCardsCards.map(c => [c.dataset.id, c]));
+    const cardsFragment = document.createDocumentFragment();
 
     historyItems.forEach((item, index) => {
-        let card = cardsMap.get(item.id.toString());
-        if (!card) {
-            card = document.createElement('div');
-            card.dataset.id = item.id;
-        }
-        card.className = `item-card ${index === selectedIndex ? 'selected' : ''}`;
-        card.dataset.id = item.id;
-        card.dataset.index = index;
-
         const isCode = isCodeSnippet(item.content);
         const timeAgo = formatTimeAgo(item.created_at);
 
-        let cardInner = '';
-        if (uiMode === 'list') {
-            cardInner = `
-                <div class="list-item-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        ${item.type === 'text' 
-                            ? '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>' 
-                            : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>'}
+        // List Mode Card
+        let listCard = listCardsMap.get(item.id.toString());
+        if (!listCard) {
+            listCard = document.createElement('div');
+            listCard.dataset.id = item.id;
+        }
+        listCard.className = `item-card ${index === selectedIndex ? 'selected' : ''}`;
+        listCard.dataset.index = index;
+
+        let listCardInner = `
+            <div class="list-item-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${item.type === 'text' 
+                        ? '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>' 
+                        : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>'}
+                </svg>
+            </div>
+            ${item.type === 'image' 
+                ? `<img src="${item.content}" class="item-image-preview" alt="Image">`
+                : `<div class="item-content">${escapeHtml(item.content)}</div>`
+            }
+            <div class="list-item-actions">
+                <button class="action-btn star-btn ${item.pinned ? 'pinned' : ''}" title="${item.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="${item.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
+                </button>
+            </div>
+        `;
+        listCard.innerHTML = listCardInner;
+        listFragment.appendChild(listCard);
+        listCardsMap.delete(item.id.toString());
+
+        // Cards Mode Card
+        let cardCard = cardsCardsMap.get(item.id.toString());
+        if (!cardCard) {
+            cardCard = document.createElement('div');
+            cardCard.dataset.id = item.id;
+        }
+        cardCard.className = `item-card ${index === selectedIndex ? 'selected' : ''}`;
+        cardCard.dataset.index = index;
+
+        let cardCardInner = `
+            <div class="item-header">
+                <div class="item-meta">
+                    <span class="badge ${item.type === 'image' ? 'badge-image' : 'badge-text'}">${item.type}</span>
+                    <span class="item-time">${timeAgo}</span>
                 </div>
-                ${item.type === 'image' 
-                    ? `<img src="${item.content}" class="item-image-preview" alt="Image">`
-                    : `<div class="item-content">${escapeHtml(item.content)}</div>`
-                }
-                <div class="list-item-actions">
+                <div class="item-actions">
                     <button class="action-btn star-btn ${item.pinned ? 'pinned' : ''}" title="${item.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="${item.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                         </svg>
                     </button>
+                    <button class="action-btn" title="Delete" data-action="delete">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-            `;
-        } else {
-            cardInner = `
-                <div class="item-header">
-                    <div class="item-meta">
-                        <span class="badge ${item.type === 'image' ? 'badge-image' : 'badge-text'}">${item.type}</span>
-                        <span class="item-time">${timeAgo}</span>
-                    </div>
-                    <div class="item-actions">
-                        <button class="action-btn star-btn ${item.pinned ? 'pinned' : ''}" title="${item.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="${item.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                        </button>
-                        <button class="action-btn" title="Delete" data-action="delete">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                
-                ${item.type === 'image' 
-                    ? `<img src="${item.content}" class="item-image-preview" alt="Clipboard Image">`
-                    : `<div class="item-content ${isCode ? 'code-snippet' : ''}">${escapeHtml(item.content)}</div>`
-                }
+            </div>
+            
+            ${item.type === 'image' 
+                ? `<img src="${item.content}" class="item-image-preview" alt="Clipboard Image">`
+                : `<div class="item-content ${isCode ? 'code-snippet' : ''}">${escapeHtml(item.content)}</div>`
+            }
 
-                ${item.tags && item.tags.length > 0 ? `
-                    <div class="item-tags">
-                        ${item.tags.map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
-                    </div>
-                ` : ''}
-            `;
-        }
-        
-        card.innerHTML = cardInner;
-        fragment.appendChild(card);
-        cardsMap.delete(item.id.toString());
+            ${item.tags && item.tags.length > 0 ? `
+                <div class="item-tags">
+                    ${item.tags.map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
+                </div>
+            ` : ''}
+        `;
+        cardCard.innerHTML = cardCardInner;
+        cardsFragment.appendChild(cardCard);
+        cardsCardsMap.delete(item.id.toString());
     });
 
-    cardsMap.forEach(card => card.remove());
-    itemList.appendChild(fragment);
+    listCardsMap.forEach(card => card.remove());
+    cardsCardsMap.forEach(card => card.remove());
+
+    itemList.appendChild(listFragment);
+    itemCards.appendChild(cardsFragment);
 
     scrollToSelected();
     if (uiMode === 'list' && historyItems[selectedIndex]) {
@@ -480,8 +510,17 @@ function setupPopupInteraction() {
             clearTimeout(hideTimeout);
         });
         previewPopup.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => hidePreview(), 100);
+            hideTimeout = setTimeout(() => hidePreview(), 50);
         });
+        if (btnPreviewDelete) {
+            btnPreviewDelete.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentPreviewId !== null) {
+                    deleteItem(currentPreviewId);
+                    hidePreview();
+                }
+            });
+        }
         previewPopup.dataset.eventsBound = "true";
     }
 }
@@ -489,6 +528,12 @@ function setupPopupInteraction() {
 function showPreview(item, cardElement) {
     if (!cardElement) {
         cardElement = document.querySelector(`.item-card[data-id="${item.id}"]`);
+    }
+
+    currentPreviewId = item.id;
+    document.querySelectorAll('.item-card.preview-active').forEach(c => c.classList.remove('preview-active'));
+    if (cardElement) {
+        cardElement.classList.add('preview-active');
     }
 
     previewType.textContent = item.type;
@@ -515,14 +560,14 @@ function showPreview(item, cardElement) {
         const popupRect = previewPopup.getBoundingClientRect();
         const bodyHeight = document.body.clientHeight;
 
-        let top = cardRect.bottom + 8;
+        let top = cardRect.bottom;
         let availableBelow = bodyHeight - 10 - top;
-        let availableAbove = cardRect.top - 60 - 8;
+        let availableAbove = cardRect.top - 60;
 
         if (availableBelow >= popupRect.height) {
             previewPopup.style.top = `${top}px`;
         } else if (availableAbove >= popupRect.height) {
-            top = cardRect.top - popupRect.height - 8;
+            top = cardRect.top - popupRect.height;
             previewPopup.style.top = `${top}px`;
         } else {
             // Doesn't fit, pick side with most space and shrink
@@ -531,7 +576,7 @@ function showPreview(item, cardElement) {
                 previewPopup.style.maxHeight = `${availableBelow}px`;
             } else {
                 previewPopup.style.maxHeight = `${availableAbove}px`;
-                top = cardRect.top - availableAbove - 8;
+                top = cardRect.top - availableAbove;
                 previewPopup.style.top = `${top}px`;
             }
         }
@@ -544,6 +589,7 @@ function showPreview(item, cardElement) {
 function hidePreview() {
     previewPopup.classList.remove('visible');
     previewPopup.classList.add('hidden');
+    document.querySelectorAll('.item-card.preview-active').forEach(c => c.classList.remove('preview-active'));
 }
 
 function handleGlobalKeydown(e) {
@@ -603,14 +649,20 @@ function handleGlobalKeydown(e) {
 }
 
 function updateSelectionUI() {
-    const cards = itemList.querySelectorAll('.item-card');
-    cards.forEach((card, idx) => {
+    const listCards = itemList.querySelectorAll('.item-card');
+    const cardsCards = itemCards.querySelectorAll('.item-card');
+    
+    const updateCard = (card, idx) => {
         if (idx === selectedIndex) {
             card.classList.add('selected');
         } else {
             card.classList.remove('selected');
         }
-    });
+    };
+    
+    listCards.forEach(updateCard);
+    cardsCards.forEach(updateCard);
+    
     scrollToSelected();
 
     if (uiMode === 'list' && historyItems[selectedIndex]) {
@@ -622,7 +674,8 @@ function updateSelectionUI() {
 }
 
 function scrollToSelected() {
-    const selectedCard = itemList.querySelector('.item-card.selected');
+    const activeList = uiMode === 'list' ? itemList : itemCards;
+    const selectedCard = activeList.querySelector('.item-card.selected');
     if (selectedCard) {
         selectedCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }

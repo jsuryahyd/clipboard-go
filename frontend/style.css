@@ -44,8 +44,6 @@ body {
     height: 100vh;
     background: var(--bg-main);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
     overflow: hidden;
 }
@@ -270,7 +268,8 @@ body {
     transition: all 0.15s ease;
 }
 
-.item-card:hover {
+.item-card:hover,
+.item-card.preview-active {
     background: var(--bg-card-hover);
     border-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-1px);
@@ -327,7 +326,8 @@ body {
 }
 
 .item-card:hover .item-actions,
-.item-card.selected .item-actions {
+.item-card.selected .item-actions,
+.item-card.preview-active .item-actions {
     opacity: 1;
 }
 
@@ -682,7 +682,8 @@ kbd {
     background: transparent;
 }
 
-.item-list.list-mode .item-card:hover {
+.item-list.list-mode .item-card:hover,
+.item-list.list-mode .item-card.preview-active {
     background: rgba(255, 255, 255, 0.05);
     border: none;
 }
@@ -735,7 +736,8 @@ kbd {
 }
 
 .item-list.list-mode .item-card:hover .list-item-actions,
-.item-list.list-mode .item-card.selected .list-item-actions {
+.item-list.list-mode .item-card.selected .list-item-actions,
+.item-list.list-mode .item-card.preview-active .list-item-actions {
     opacity: 1;
 }
 
